@@ -1,4 +1,5 @@
-:set -itest
-:set -isrc
-:set prompt " > "
 :set -Wall
+:set -fobject-code
+:set -isrc
+:set -itest
+:set prompt " > "
