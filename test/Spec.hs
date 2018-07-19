@@ -1,5 +1,7 @@
 module Main
-  ( main
+  ( hspec
+  , creditCardValidatorSpec
+  , main
   ) where
 
 import Test.Hspec (hspec)
