@@ -1,7 +1,3 @@
-:set -Wall
-:set -fobject-code
-:set -hidir .dev
 :set -isrc
 :set -itest
-:set -odir .dev
 :set prompt " > "
