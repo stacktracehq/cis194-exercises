@@ -1,12 +1,13 @@
 module Week01.TowersOfHanoiSpec
-  ( towersOfHanoiSpec
+  ( spec
+  , hspec
   ) where
 
+import Test.Hspec (Spec, describe, hspec, it, shouldBe)
 import Week01.TowersOfHanoi (hanoi)
-import Test.Hspec (describe, it, shouldBe, Spec)
 
-towersOfHanoiSpec :: Spec
-towersOfHanoiSpec =
+spec :: Spec
+spec =
   describe "TowersOfHanoi"
     hanoiSpec
 

@@ -1,8 +1,9 @@
 module Week01.CreditCardValidatorSpec
-  ( creditCardValidatorSpec
+  ( spec
+  , hspec
   ) where
 
-import Test.Hspec (Spec, describe, it, shouldBe)
+import Test.Hspec (Spec, describe, hspec, it, shouldBe)
 import Week01.CreditCardValidator
   ( doubleEveryOther
   , doubleEveryOther
@@ -12,8 +13,8 @@ import Week01.CreditCardValidator
   , validate
   )
 
-creditCardValidatorSpec :: Spec
-creditCardValidatorSpec =
+spec :: Spec
+spec =
   describe "CreditCardValidator" $ do
     toDigitsSpec
     toDigitsRevSpec

@@ -1,11 +1,13 @@
 module Main
-  ( hspec
-  , creditCardValidatorSpec
-  , main
+  ( main
   ) where
 
-import Test.Hspec (hspec)
-import Week01.CreditCardValidatorSpec (creditCardValidatorSpec)
+import Test.Hspec (hspec, Spec)
+import qualified Week01.CreditCardValidatorSpec
+
+spec :: Spec
+spec =  do
+  Week01.CreditCardValidatorSpec.spec
 
 main :: IO ()
-main = hspec creditCardValidatorSpec
+main = hspec spec

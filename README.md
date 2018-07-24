@@ -90,7 +90,7 @@ $ ghci test/Week01/CreditCardValidatorSpec.hs
 GHCi, version 8.2.2: http://www.haskell.org/ghc/  :? for help
 Loaded GHCi configuration from /Users/bradparker/code/cosmos/training/CIS194/.ghci
 Ok, two modules loaded.
- > hspec creditCardValidatorSpec
+ > hspec spec
 
 CreditCardValidator
   toDigits
@@ -109,3 +109,9 @@ Failures:
 ```
 
 You can also run `dev/watch` to get a file-watching test-re-running setup going with the help of GHCID.
+
+To run only the tests for a given spec file using the watch script (defaults to all specs):
+
+```
+$ dev/watch test/Week01/CreditCardValidatorSpec.hs
+```

@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
 
-nix-shell --run "ghcid --command 'cabal repl' --test Main.main test:spec"
+file=${1:-test/Spec.hs}
+
+nix-shell --run "ghcid --command ghci --test 'hspec spec' $file"
