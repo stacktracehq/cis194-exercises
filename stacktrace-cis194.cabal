@@ -14,6 +14,8 @@ library
   exposed-modules:
     Week01.CreditCardValidator
     Week01.TowersOfHanoi
+    Week02.Log
+    Week02.LogAnalysis
   build-depends:
     base >=4.10 && <5
   hs-source-dirs:
@@ -27,6 +29,7 @@ test-suite spec
     Spec.hs
   other-modules:
     Week01.CreditCardValidatorSpec
+    Week02.LogAnalysisSpec
   hs-source-dirs:
     test
   default-extensions:
