@@ -1,3 +1,5 @@
+:set -Wall
+:set -fno-warn-type-defaults
 :set -isrc
 :set -itest
 :set prompt " > "
