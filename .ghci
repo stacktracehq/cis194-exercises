@@ -1,5 +1,6 @@
 :set -Wall
 :set -fno-warn-type-defaults
+:set -fno-warn-unused-imports
 :set -isrc
 :set -itest
 :set prompt " > "
