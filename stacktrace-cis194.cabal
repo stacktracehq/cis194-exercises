@@ -16,6 +16,7 @@ library
     Week01.TowersOfHanoi
     Week02.Log
     Week02.LogAnalysis
+    Week03.Golf
   build-depends:
     base >=4.10 && <5
   hs-source-dirs:
@@ -30,6 +31,7 @@ test-suite spec
   other-modules:
     Week01.CreditCardValidatorSpec
     Week02.LogAnalysisSpec
+    Week03.GolfSpec
   hs-source-dirs:
     test
   default-extensions:
