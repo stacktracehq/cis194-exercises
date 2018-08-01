@@ -36,6 +36,7 @@ test-suite spec
     OverloadedStrings
   ghc-options:
     -Wall
+    -fno-warn-type-defaults
   build-depends:
     base >=4.10 && <5,
     hspec,
