@@ -1,5 +1,6 @@
 module Week02.LogAnalysisSpec
   ( spec
+  , hspec
   ) where
 
 import Test.Hspec (Spec, describe, hspec, it, shouldBe)
@@ -11,10 +12,8 @@ import Week02.LogAnalysis
   , inOrder
   , insert
   , parse
-  , testParse
   , parseMessage
   , whatWentWrong
-  , testWhatWentWrong
   )
 
 spec :: Spec
