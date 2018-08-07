@@ -17,6 +17,7 @@ library
     Week02.Log
     Week02.LogAnalysis
     Week03.Golf
+    Week04.Soln
   build-depends:
     base >=4.10 && <5
   hs-source-dirs:
@@ -32,6 +33,7 @@ test-suite spec
     Week01.CreditCardValidatorSpec
     Week02.LogAnalysisSpec
     Week03.GolfSpec
+    Week04.SolnSpec
   hs-source-dirs:
     test
   default-extensions:
