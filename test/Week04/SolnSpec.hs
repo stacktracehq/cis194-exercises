@@ -3,7 +3,7 @@ module Week04.SolnSpec
   , hspec
   ) where
 
-import Test.Hspec (Spec, describe, hspec, it, shouldBe, shouldSatisfy)
+import Test.Hspec (Spec, describe, hspec, it, context, shouldBe, shouldSatisfy)
 import Data.List ((\\))
 import Week04.Soln
   ( fun1
@@ -55,32 +55,48 @@ fun2'Spec =
 foldTreeSpec :: Spec
 foldTreeSpec =
   describe "foldTree" $ do
+    let abcResult = foldTree "ABC"
+    let abcdResult = foldTree "ABCD"
+    let abcdefghijResult = foldTree "ABCDEFGHIJ"
+    let oneTo100Result = foldTree [1..100]
+
     it "produces a single leaf for an empty list" $
       foldTree ([] :: String) `shouldBe` Leaf
     it "produces a tree of height 0 for a singleton list" $
       foldTree ['a'] `shouldBe` Node 0 Leaf 'a' Leaf
-    it "produces a balanced binary for 'ABC'" $ do
-      let result = foldTree "ABC"
-      result `shouldSatisfy` isBalanced
-      unfoldTree result `shouldSatisfy` containsAllInputs "ABC"
-    it "produces a balanced binary tree for 'ABCD'" $ do
-      let result = foldTree "ABCD"
-      result `shouldSatisfy` isBalanced
-      unfoldTree result `shouldSatisfy` containsAllInputs "ABCD"
-    it "produces a balanced binary tree for 'ABCDEFGHIJ'" $ do
-      let result = foldTree "ABCDEFGHIJ"
-      result `shouldSatisfy` isBalanced
-      unfoldTree result `shouldSatisfy` containsAllInputs "ABCDEFGHIJ"
-    it "produces a balanced binary tree for [1..100]" $ do
-      let result = foldTree [1..100]
-      result `shouldSatisfy` isBalanced
-      unfoldTree result `shouldSatisfy` containsAllInputs [1..100]
+    context "produces trees of the correct height" $ do
+      it "height of foldTree 'ABC' == 1" $
+        treeHeight abcResult `shouldBe` 1
+      it "height of foldTree 'ABCD' == 2" $
+        treeHeight abcdResult `shouldBe` 2
+      it "height of foldTree 'ABCDEFGHIJ' == 3" $
+        treeHeight abcdefghijResult `shouldBe` 3
+      it "height of foldTree [1..100] == 6" $
+        treeHeight oneTo100Result `shouldBe` 6
+    context "produces balanced trees" $ do
+      it "foldTree 'ABC' is balanced" $
+        abcResult `shouldSatisfy` isBalanced
+      it "foldTree 'ABCD' is balanced" $
+        abcdResult `shouldSatisfy` isBalanced
+      it "foldTree 'ABCDEFGHIJ' is balanced" $
+        abcdefghijResult `shouldSatisfy` isBalanced
+      it "foldTree [1..100] is balanced" $
+        oneTo100Result `shouldSatisfy` isBalanced
+    context "produces trees that contain all the input values" $ do
+      it "foldTree 'ABC' contains all inputs" $
+        unfoldTree abcResult `shouldSatisfy` containsAllInputs "ABC"
+      it "foldTree 'ABCD' contains all inputs" $
+        unfoldTree abcdResult `shouldSatisfy` containsAllInputs "ABCD"
+      it "foldTree 'ABCDEFGHIJ' contains all inputs" $
+        unfoldTree abcdefghijResult `shouldSatisfy` containsAllInputs "ABCDEFGHIJ"
+      it "foldTree [1..100] contains all inputs" $
+        unfoldTree oneTo100Result `shouldSatisfy` containsAllInputs [1..100]
   where
     treeHeight Leaf = -1
     treeHeight (Node h _ _ _ ) = h
     balancedAtNode lt rt = abs (treeHeight lt - treeHeight rt) <= 1
     isBalanced Leaf = True
-    isBalanced (Node _ lt _ rt) = balancedAtNode lt rt && (isBalanced lt) && (isBalanced rt)
+    isBalanced (Node _ lt _ rt) = balancedAtNode lt rt && isBalanced lt && isBalanced rt
     unfoldTree Leaf = [] :: [a]
     unfoldTree (Node _ lt x rt) = x : (unfoldTree lt ++ unfoldTree rt)
     containsAllInputs xs ys = null (xs \\ ys) && null (ys \\ xs)
