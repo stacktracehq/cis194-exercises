@@ -5,6 +5,8 @@ module Week04.Soln
   , fun2'
   , Tree(..)
   , foldTree
+  , showTree
+  , printTree
   , xor
   , map'
   , myFoldl
@@ -38,6 +40,19 @@ data Tree a = Leaf | Node Integer (Tree a) a (Tree a) deriving (Show, Eq)
 
 foldTree :: [a] -> Tree a
 foldTree = error "Week04.Soln#foldTree not implemented"
+
+showTree :: Show a => Tree a -> String
+showTree Leaf = ""
+showTree n@(Node s _ _ _) = go s n
+  where
+  go _ (Leaf) = ""
+  go i (Node h l c r) = go (i-1) l ++
+    replicate (4*fromIntegral i) ' ' ++ show c ++ "-" ++ show h ++ "\n" ++ go (i-1) r
+
+-- will print a tree in ghci, root node will be the rightmost in the printed structure
+-- nodes will be printed as [value]-[height]
+printTree :: Show a => Tree a -> IO ()
+printTree t = putStrLn $ showTree t
 
 ---------------------------  Exercise 3
 

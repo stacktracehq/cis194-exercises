@@ -71,8 +71,6 @@ foldTreeSpec =
         treeHeight abcdResult `shouldBe` 2
       it "height of foldTree 'ABCDEFGHIJ' == 3" $
         treeHeight abcdefghijResult `shouldBe` 3
-      it "height of foldTree [1..100] == 6" $
-        treeHeight oneTo100Result `shouldBe` 6
     context "produces balanced trees" $ do
       it "foldTree 'ABC' is balanced" $
         abcResult `shouldSatisfy` isBalanced
