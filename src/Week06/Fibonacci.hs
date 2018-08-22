@@ -13,7 +13,7 @@ module Week06.Fibonacci
   , nats
   , ruler
   , fibs3
-  , fibs4
+  , fib4
   ) where
 
 ---------------------------  Exercise 1
@@ -72,6 +72,6 @@ fibs3 =
 
 --------------------------- Exercise 7
 
-fibs4 :: Integer -> Integer
-fibs4 =
+fib4 :: Integer -> Integer
+fib4 =
   error "Week06.Fibonacci#fibs4 not implemented"
