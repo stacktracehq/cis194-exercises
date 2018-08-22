@@ -22,6 +22,7 @@ library
     Week05.ExprT
     Week05.Parser
     Week05.StackVM
+    Week06.Fibonacci
   build-depends:
     base >=4.10 && <5,
     containers
@@ -40,6 +41,7 @@ test-suite spec
     Week03.GolfSpec
     Week04.SolnSpec
     Week05.CalcSpec
+    Week06.FibonacciSpec
   hs-source-dirs:
     test
   default-extensions:
