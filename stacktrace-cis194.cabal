@@ -19,8 +19,12 @@ library
     Week03.Golf
     Week04.Soln
     Week05.Calc
+    Week05.ExprT
+    Week05.Parser
+    Week05.StackVM
   build-depends:
-    base >=4.10 && <5
+    base >=4.10 && <5,
+    containers
   hs-source-dirs:
     src
   default-language:
@@ -45,6 +49,7 @@ test-suite spec
     -fno-warn-type-defaults
   build-depends:
     base >=4.10 && <5,
+    containers,
     hspec,
     stacktrace-cis194
   default-language:

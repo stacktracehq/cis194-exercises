@@ -4,7 +4,7 @@ module Week05.CalcSpec
   ) where
 
 import qualified Data.Map as M
-import Test.Hspec (Spec, describe, hspec, it, context, shouldBe, shouldSatisfy)
+import Test.Hspec (Spec, describe, hspec, it, context, shouldBe)
 import Week05.ExprT
 import Week05.Parser
 import qualified Week05.StackVM as SVM
