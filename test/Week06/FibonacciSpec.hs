@@ -33,8 +33,8 @@ spec =
     fibs3Spec
     fib4Spec
 
-first100Fibs :: [Integer]
-first100Fibs = [ 0
+fib0Tofib100 :: [Integer]
+fib0Tofib100 = [ 0
   , 1
   , 1
   , 2
@@ -134,6 +134,7 @@ first100Fibs = [ 0
   , 83621143489848422977
   , 135301852344706746049
   , 218922995834555169026
+  , 354224848179261915075
   ]
 
 fibSpec :: Spec
@@ -166,7 +167,7 @@ fibs2Spec :: Spec
 fibs2Spec =
   describe "fibs2" $
     it "produces an infinite list of all the fibonacci numbers in linear time" $
-      take 100 fibs2 `shouldBe` first100Fibs
+      take 101 fibs2 `shouldBe` fib0Tofib100
 
 -- The order of the following might look strange.
 -- There are a lot of interlocking dependencies.
@@ -212,16 +213,16 @@ fibs3Spec :: Spec
 fibs3Spec =
   describe "fibs3" $
     it "produces an infinite list of all the fibonacci numbers" $
-      take 100 (streamToList fibs3) `shouldBe` first100Fibs
+      take 101 (streamToList fibs3) `shouldBe` fib0Tofib100
 
 fib4Spec :: Spec
 fib4Spec =
   describe "fib4" $ do
-    it "calculates the 0th fib number" $
+    it "fib4 0 == 0" $
       fib4 0 `shouldBe` 0
-    it "calculates the 1st fib number" $
+    it "fib4 1 == 1" $
       fib4 1 `shouldBe` 1
-    it "calculates the 5th fib number" $
+    it "fib4 5 == 5" $
       fib4 5 `shouldBe` 5
-    it "calculates the 100th fib number" $
-      fib4 100 `shouldBe` 218922995834555169026
+    it "fib4 100 == 354224848179261915075" $
+      fib4 100 `shouldBe` 354224848179261915075
