@@ -38,6 +38,7 @@ library
     -Wall
   build-depends:
     base >=4.10 && <5,
+    array,
     containers,
     mtl,
     MonadRandom
