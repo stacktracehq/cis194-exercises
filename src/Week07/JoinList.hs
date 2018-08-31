@@ -18,7 +18,9 @@ module Week07.JoinList
 import Week07.Buffer (Buffer(..))
 import Week07.Editor (editor, runEditor)
 import Week07.Scrabble (Score(..))
-import Week07.Sized (Sized(..), Size(..))
+import Week07.Sized (Sized(..), Size(..), getSize)
+
+import Data.Monoid
 
 data JoinList m a
   = Empty
@@ -42,21 +44,58 @@ joinListToList (Append _ l r) = joinListToList l ++ joinListToList r
 -- Suggestion (no tests):
 -- Pulls the monoidal value out of the root of the JoinList
 tag :: Monoid m => JoinList m a -> m
-tag = error "Week07.JoinList#tag not implemented"
+tag Empty = mempty
+tag (Single m _) = m
+tag (Append m _ _) = m
 
 (+++) :: Monoid m => JoinList m a -> JoinList m a -> JoinList m a
-(+++) = error "Week07.JoinList#(+++) not implemented"
+(+++) a b = Append (tag a <> tag b) a b
 
 --------------------------- Exercise 2
 
+tagSize :: (Sized b, Monoid b) => JoinList b a -> Int
+tagSize = getSize . size . tag
+
 indexJ :: (Sized b, Monoid b) => Int -> JoinList b a -> Maybe a
-indexJ = error "Week07.JoinList#indexJ not implemented"
+indexJ _ Empty = Nothing
+indexJ i (Single _ v)
+    | i == 0 = Just v
+    | otherwise = Nothing
+indexJ i (Append _ l r)
+    | i < ln = indexJ i l
+    | i - ln < rn = indexJ (i - ln) r
+    | otherwise = Nothing
+    where 
+      ln = tagSize l
+      rn = tagSize r
 
 dropJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
-dropJ = error "Week07.JoinList#dropJ not implemented"
+dropJ _ Empty = Empty
+dropJ n x@(Single _ _)
+    | n > 0 = Empty
+    | otherwise = x
+dropJ n x@(Append _ l r)
+    | n >= ln + rn = Empty
+    | n >= ln = dropJ (n - ln) r
+    | n > 0 = dropJ n l +++ r
+    | otherwise = x
+    where 
+      ln = tagSize l
+      rn = tagSize r
 
 takeJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
-takeJ = error "Week07.JoinList#takeJ not implemented"
+takeJ _ Empty = Empty
+takeJ n x@(Single _ _)
+    | n > 0 = x
+    | otherwise = Empty
+takeJ n x@(Append _ l r)
+    | n >= ln + rn = x
+    | n >= ln = l +++ takeJ (n - ln) r
+    | n > 0 = takeJ n l
+    | otherwise = Empty
+    where 
+      ln = tagSize l
+      rn = tagSize r
 
 --------------------------- Exercise 3
 
