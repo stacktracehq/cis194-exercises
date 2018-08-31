@@ -11,14 +11,15 @@ module Week07.JoinList
   , dropJ
   , takeJ
   , scoreLine
-  , tag
   , main
   ) where
 
+import Data.Foldable (Foldable(..))
+import Data.Monoid (Monoid(..), (<>))
 import Week07.Buffer (Buffer(..))
 import Week07.Editor (editor, runEditor)
-import Week07.Scrabble (Score(..))
-import Week07.Sized (Sized(..), Size(..))
+import Week07.Scrabble (Score(..), scoreString)
+import Week07.Sized (Size(..), Sized(..), getSize)
 
 data JoinList m a
   = Empty
@@ -39,57 +40,119 @@ joinListToList (Append _ l r) = joinListToList l ++ joinListToList r
 
 --------------------------- Exercise 1
 
--- Suggestion (no tests):
--- Pulls the monoidal value out of the root of the JoinList
 tag :: Monoid m => JoinList m a -> m
-tag = error "Week07.JoinList#tag not implemented"
+tag Empty = mempty
+tag (Single m _) = m
+tag (Append m _ _) = m
 
 (+++) :: Monoid m => JoinList m a -> JoinList m a -> JoinList m a
-(+++) = error "Week07.JoinList#(+++) not implemented"
+Empty +++ a = a
+a +++ Empty = a
+as +++ bs = Append (tag as <> tag bs) as bs
 
 --------------------------- Exercise 2
 
+instance Foldable (JoinList m) where
+  foldr :: (a -> b -> b) -> b -> JoinList m a -> b
+  foldr _ b Empty = b
+  foldr f b (Single _ a) = f a b
+  foldr f b (Append _ l r) = foldr f (foldr f b r) l
+
+instance Sized b => Sized (JoinList b a) where
+  size Empty = mempty
+  size (Single m _) = size m
+  size (Append m _ _) = size m
+
+searchJ :: (Sized b, Monoid b) => (b -> Bool) -> JoinList b a -> Maybe a
+searchJ p as
+  | p (tag as) = go mempty as
+  | otherwise = Nothing
+  where
+    go _ Empty = Nothing
+    go _ (Single _ a) = Just a
+    go i (Append _ l r)
+      | p (i <> tag l) = go i l
+      | otherwise = go (i <> tag l) r
+
 indexJ :: (Sized b, Monoid b) => Int -> JoinList b a -> Maybe a
-indexJ = error "Week07.JoinList#indexJ not implemented"
+indexJ i as
+  | i < 0 = Nothing
+  | otherwise = searchJ ((> Size i) . size) as
 
 dropJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
-dropJ = error "Week07.JoinList#dropJ not implemented"
+dropJ n = go mempty
+  where
+    go _ Empty = Empty
+    go i (Single m a)
+      | Size n >= size (i <> m) = Empty
+      | otherwise = Single m a
+    go i (Append _ l r)
+      | Size n >= size (i <> tag l) = go (i <> tag l) r
+      | otherwise = go i l +++ go (i <> tag l) r
 
 takeJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
-takeJ = error "Week07.JoinList#takeJ not implemented"
+takeJ n = go mempty
+  where
+    go _ Empty = Empty
+    go i (Single m a)
+      | Size n < size (i <> m) = Empty
+      | otherwise = Single m a
+    go i (Append _ l r)
+      | Size n < size (i <> tag l) = go i l
+      | otherwise = go i l +++ go (i <> tag l) r
 
 --------------------------- Exercise 3
 
 scoreLine :: String -> JoinList Score String
-scoreLine = error "Week07.JoinList#scoreLine not implemented"
+scoreLine =
+  Single <$> scoreString <*> id
 
 --------------------------- Exercise 4
 
 instance Buffer (JoinList (Score, Size) String) where
   toString :: JoinList (Score, Size) String -> String
-  toString = error "Week07.JoinList#toString not implemented for Buffer (JoinList (Score, Size) String)"
+  toString Empty = ""
+  toString (Single _ a) = a
+  toString (Append _ as bs) = toString as ++ toString bs
 
   fromString :: String -> JoinList (Score, Size) String
-  fromString = error "Week07.JoinList#fromString not implemented for Buffer (JoinList (Score, Size) String)"
+  fromString =
+    foldr ((+++) . go) Empty . lines
+      where
+        go l = Single (scoreString l, Size 1) l
 
   line :: Int -> JoinList (Score, Size) String -> Maybe String
-  line = error "Week07.JoinList#line not implemented for Buffer (JoinList (Score, Size) String)"
+  line =
+    indexJ
 
   replaceLine ::
        Int
     -> String
     -> JoinList (Score, Size) String
     -> JoinList (Score, Size) String
-  replaceLine = error "Week07.JoinList#replaceLine not implemented for Buffer (JoinList (Score, Size) String)"
+  replaceLine n _ as | Size n > size as = as
+  replaceLine n str as =
+    takeJ n as +++
+    Single (scoreString str, Size 1) str +++
+    dropJ (n + 1) as
 
   numLines :: JoinList (Score, Size) String -> Int
-  numLines = error "Week07.JoinList#numLines not implemented for Buffer (JoinList (Score, Size) String)"
+  numLines =
+    getSize . snd . tag
 
   value :: JoinList (Score, Size) String -> Int
-  value = error "Week07.JoinList#value not implemented for Buffer (JoinList (Score, Size) String)"
+  value =
+    getScore . fst . tag
 
 initialValue :: JoinList (Score, Size) String
-initialValue = error "Week07.JoinList#initialValue not implemented"
+initialValue =
+  fromString $
+  unlines
+    [ "This buffer is for notes you don't want to save, and for"
+    , "evaluation of steam valve coefficients."
+    , "To load a different file, type the character L followed"
+    , "by the name of the file."
+    ]
 
 main :: IO ()
 main =

@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, FlexibleInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 module Week07.Scrabble
   ( Score(..)
@@ -6,7 +6,8 @@ module Week07.Scrabble
   , scoreString
   ) where
 
-import Data.Char (toLower)
+import Data.Char (toUpper)
+import Data.Foldable (foldMap)
 
 --------------------------- Exercise 3
 
@@ -14,40 +15,42 @@ newtype Score = Score { getScore :: Int }
   deriving (Show, Eq, Ord, Num)
 
 instance Semigroup Score where
-  (<>) = error "Week07.Scrabble#mappend not implemented for Monoid Score"
+  (<>) = (+)
 
 instance Monoid Score where
-  mempty = error "Week07.Scrabble#mempty not implemented for Monoid Score"
+  mempty = Score 0
 
 score :: Char -> Score
-score c = case toLower c of
-  'a' -> Score 1
-  'b' -> Score 3
-  'c' -> Score 3
-  'd' -> Score 2
-  'e' -> Score 1
-  'f' -> Score 4
-  'g' -> Score 2
-  'h' -> Score 4
-  'i' -> Score 1
-  'j' -> Score 8
-  'k' -> Score 5
-  'l' -> Score 1
-  'm' -> Score 3
-  'n' -> Score 1
-  'o' -> Score 1
-  'p' -> Score 3
-  'q' -> Score 10
-  'r' -> Score 1
-  's' -> Score 1
-  't' -> Score 1
-  'u' -> Score 1
-  'v' -> Score 4
-  'w' -> Score 4
-  'x' -> Score 8
-  'y' -> Score 4
-  'z' -> Score 10
-  _ -> mempty
+score c = Score $
+  case toUpper c of
+    'A' -> 1
+    'B' -> 3
+    'C' -> 3
+    'D' -> 2
+    'E' -> 1
+    'F' -> 4
+    'G' -> 2
+    'H' -> 4
+    'I' -> 1
+    'J' -> 8
+    'K' -> 5
+    'L' -> 1
+    'M' -> 3
+    'N' -> 1
+    'O' -> 1
+    'P' -> 3
+    'Q' -> 10
+    'R' -> 1
+    'S' -> 1
+    'T' -> 1
+    'U' -> 1
+    'V' -> 4
+    'W' -> 4
+    'X' -> 8
+    'Y' -> 4
+    'Z' -> 10
+    _ -> 0
 
 scoreString :: String -> Score
-scoreString = error "Week07.Scrabble#scoreString not implemented"
+scoreString =
+  foldMap score
