@@ -17,7 +17,8 @@ instance Semigroup Score where
   (<>) a b = Score (getScore a + getScore b)
 
 instance Monoid Score where
-  mempty = error "Week07.Scrabble#mempty not implemented for Monoid Score"
+  mempty = Score 0
+  mappend = (<>)
 
 score :: Char -> Score
 score c = case toLower c of
@@ -50,4 +51,4 @@ score c = case toLower c of
   _ -> mempty
 
 scoreString :: String -> Score
-scoreString = error "Week07.Scrabble#scoreString not implemented"
+scoreString = sum . fmap score

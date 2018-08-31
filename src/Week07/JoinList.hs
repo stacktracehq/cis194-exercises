@@ -17,7 +17,7 @@ module Week07.JoinList
 
 import Week07.Buffer (Buffer(..))
 import Week07.Editor (editor, runEditor)
-import Week07.Scrabble (Score(..))
+import Week07.Scrabble (Score(..), scoreString, getScore)
 import Week07.Sized (Sized(..), Size(..), getSize)
 
 import Data.Monoid ()
@@ -49,6 +49,8 @@ tag (Single m _) = m
 tag (Append m _ _) = m
 
 (+++) :: Monoid m => JoinList m a -> JoinList m a -> JoinList m a
+(+++) Empty b = b
+(+++) a Empty = a
 (+++) a b = Append (tag a <> tag b) a b
 
 --------------------------- Exercise 2
@@ -100,35 +102,37 @@ takeJ n x@(Append _ l r)
 --------------------------- Exercise 3
 
 scoreLine :: String -> JoinList Score String
-scoreLine = error "Week07.JoinList#scoreLine not implemented"
+scoreLine = flip Single <*> scoreString
 
 --------------------------- Exercise 4
 
 instance Buffer (JoinList (Score, Size) String) where
   toString :: JoinList (Score, Size) String -> String
-  toString = error "Week07.JoinList#toString not implemented for Buffer (JoinList (Score, Size) String)"
+  toString = mconcat . joinListToList
 
   fromString :: String -> JoinList (Score, Size) String
-  fromString = error "Week07.JoinList#fromString not implemented for Buffer (JoinList (Score, Size) String)"
+  fromString s = foldr addLine Empty (lines s)
+    where addLine l list = Single (scoreString l, 1) l +++ list 
 
   line :: Int -> JoinList (Score, Size) String -> Maybe String
-  line = error "Week07.JoinList#line not implemented for Buffer (JoinList (Score, Size) String)"
+  line = indexJ
 
   replaceLine ::
        Int
     -> String
     -> JoinList (Score, Size) String
     -> JoinList (Score, Size) String
-  replaceLine = error "Week07.JoinList#replaceLine not implemented for Buffer (JoinList (Score, Size) String)"
+  replaceLine n _ list | n < 0 || n > tagSize list = list
+  replaceLine n l list = takeJ n list +++ fromString l +++ dropJ (n + 1) list
 
   numLines :: JoinList (Score, Size) String -> Int
-  numLines = error "Week07.JoinList#numLines not implemented for Buffer (JoinList (Score, Size) String)"
+  numLines = tagSize
 
   value :: JoinList (Score, Size) String -> Int
-  value = error "Week07.JoinList#value not implemented for Buffer (JoinList (Score, Size) String)"
+  value = getScore . fst . tag
 
 initialValue :: JoinList (Score, Size) String
-initialValue = error "Week07.JoinList#initialValue not implemented"
+initialValue = fromString "hello!"
 
 main :: IO ()
 main =
