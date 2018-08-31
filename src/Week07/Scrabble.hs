@@ -14,7 +14,7 @@ newtype Score = Score { getScore :: Int }
   deriving (Show, Eq, Ord, Num)
 
 instance Semigroup Score where
-  (<>) = error "Week07.Scrabble#mappend not implemented for Monoid Score"
+  (<>) a b = Score (getScore a + getScore b)
 
 instance Monoid Score where
   mempty = error "Week07.Scrabble#mempty not implemented for Monoid Score"

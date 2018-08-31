@@ -20,7 +20,7 @@ import Week07.Editor (editor, runEditor)
 import Week07.Scrabble (Score(..))
 import Week07.Sized (Sized(..), Size(..), getSize)
 
-import Data.Monoid
+import Data.Monoid ()
 
 data JoinList m a
   = Empty
