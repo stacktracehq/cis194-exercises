@@ -28,6 +28,8 @@ library
     Week07.Sized
     Week07.JoinList
     Week07.Scrabble
+  ghc-options:
+    -Wall
   build-depends:
     base >=4.10 && <5,
     containers,
