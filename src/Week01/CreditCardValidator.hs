@@ -1,27 +1,46 @@
 module Week01.CreditCardValidator
   ( toDigits
+  , toDigits2
+  , toDigits3
   , toDigitsRev
+  , toDigitsRev2
   , doubleEveryOther
   , sumDigits
   , validate
+  , everyNth
   ) where
 
+import Data.Char (digitToInt)
+
 toDigits :: Integer -> [Integer]
-toDigits =
-  error "Week01.CreditCardValidator#toDigits not implemented"
+toDigits n
+  | n <= 0 = []
+  | otherwise = toDigits (n `div` 10) ++ [n `mod` 10]
+
+toDigits2 :: Integer -> [Integer]
+toDigits2 = reverse . toDigitsRev2
+
+toDigits3 :: Integer -> [Integer]
+toDigits3 n
+  | n <= 0 = []
+  | otherwise = map (fromIntegral . digitToInt) (show n)
 
 toDigitsRev :: Integer -> [Integer]
-toDigitsRev =
-  error "Week01.CreditCardValidator#toDigitsRev not implemented"
+toDigitsRev = reverse . toDigits
+
+toDigitsRev2 :: Integer -> [Integer]
+toDigitsRev2 n
+  | n <= 0 = []
+  | otherwise = (n `mod` 10) : toDigitsRev2 (n `div` 10)
 
 doubleEveryOther :: [Integer] -> [Integer]
-doubleEveryOther =
-  error "Week01.CreditCardValidator#doubleEveryOther not implemented"
+doubleEveryOther = reverse . everyNth 2 (*2) . reverse
+
+everyNth ::  Int -> (a -> a) -> [a] -> [a]
+everyNth n f = zipWith ($) (cycle (replicate (n - 1) id ++ [f]))
 
 sumDigits :: [Integer] -> Integer
-sumDigits =
-  error "Week01.CreditCardValidator#sumDigits not implemented"
+sumDigits = sum . (>>= toDigits)
 
 validate :: Integer -> Bool
-validate =
-  error "Week01.CreditCardValidator#validate not implemented"
+validate = (0 ==) . (`rem` 10) . sumDigits . doubleEveryOther . toDigits

@@ -6,10 +6,13 @@ module Week01.CreditCardValidatorSpec
 import Test.Hspec (Spec, describe, hspec, it, shouldBe)
 import Week01.CreditCardValidator
   ( doubleEveryOther
-  , doubleEveryOther
+  , everyNth
   , sumDigits
   , toDigits
+  , toDigits2
+  , toDigits3
   , toDigitsRev
+  , toDigitsRev2
   , validate
   )
 
@@ -17,7 +20,11 @@ spec :: Spec
 spec =
   describe "CreditCardValidator" $ do
     toDigitsSpec
+    toDigitsSpec2
+    toDigitsSpec3
     toDigitsRevSpec
+    toDigitsRevSpec2
+    everyNthSpec
     doubleEveryOtherSpec
     sumDigitsSpec
     validateSpec
@@ -30,6 +37,22 @@ toDigitsSpec =
       toDigits 0 `shouldBe` []
       toDigits (-17) `shouldBe` []
 
+toDigitsSpec2 :: Spec
+toDigitsSpec2 =
+  describe "toDigits2" $
+    it "converts positive Integers to a list of digits" $ do
+      toDigits2 1234 `shouldBe` [1,2,3,4]
+      toDigits2 0 `shouldBe` []
+      toDigits2 (-17) `shouldBe` []
+
+toDigitsSpec3 :: Spec
+toDigitsSpec3 =
+  describe "toDigits3" $
+    it "converts positive Integers to a list of digits" $ do
+      toDigits3 1234 `shouldBe` [1,2,3,4]
+      toDigits3 0 `shouldBe` []
+      toDigits3 (-17) `shouldBe` []
+
 toDigitsRevSpec :: Spec
 toDigitsRevSpec =
   describe "toDigitsRev" $
@@ -37,6 +60,21 @@ toDigitsRevSpec =
       toDigitsRev 1234 `shouldBe` [4,3,2,1]
       toDigitsRev 0 `shouldBe` []
       toDigitsRev (-17) `shouldBe` []
+
+toDigitsRevSpec2 :: Spec
+toDigitsRevSpec2 =
+  describe "toDigitsRev2" $
+    it "does what toDigits does in reverse" $ do
+      toDigitsRev2 1234 `shouldBe` [4,3,2,1]
+      toDigitsRev2 0 `shouldBe` []
+      toDigitsRev2 (-17) `shouldBe` []
+
+everyNthSpec :: Spec
+everyNthSpec =
+  describe "everyNth" $
+    it "applies a function to every nth element of a list" $ do
+      everyNth 3 (*2) [1,2,3,4,5,6] `shouldBe` ([1,2,6,4,5,12] :: [Int])
+      everyNth 3 (*2) [1,2,3,4] `shouldBe` ([1,2,6,4] :: [Int])
 
 doubleEveryOtherSpec :: Spec
 doubleEveryOtherSpec =
