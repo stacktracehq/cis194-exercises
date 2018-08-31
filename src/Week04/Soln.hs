@@ -10,9 +10,12 @@ module Week04.Soln
   , xor
   , map'
   , myFoldl
-  , cartProd
   , sieveSundaram
   ) where
+import Control.Monad (join)
+import Control.Arrow ((***))
+import Data.Maybe (fromMaybe)
+import Data.List ((\\))
 
 ---------------------------  Exercise 1
 
@@ -23,7 +26,7 @@ fun1 (x:xs)
   | otherwise = fun1 xs
 
 fun1' :: [Integer] -> Integer
-fun1' = error "Week04.Soln#fun2' not implemented"
+fun1' = foldr ((*) . subtract 2) 1 . filter even
 
 fun2 :: Integer -> Integer
 fun2 1 = 0
@@ -32,20 +35,37 @@ fun2 n
   | otherwise = fun2 (3 * n + 1)
 
 fun2' :: Integer -> Integer
-fun2' = error "Week04.Soln#fun2' not implemented"
+fun2' = sum . filter even . takeWhile (>1) . iterate (\n -> if even n then n `div` 2 else 3 * n + 1)
 
 ---------------------------  Exercise 2
 
 data Tree a = Leaf | Node Integer (Tree a) a (Tree a) deriving (Show, Eq)
 
+height :: Tree a -> Maybe Integer
+height Leaf = Nothing
+height (Node h _ _ _) = Just h
+
+setNodeHeight :: Tree a -> Tree a
+setNodeHeight (Node _ l c r) = Node (calcHeight (l, r)) l c r
+  where
+    mapTuple = join (***)
+    calcHeight = (+1) . fromMaybe 0 . uncurry max . mapTuple height
+setNodeHeight t = t
+
+insertNode :: a -> Tree a -> Tree a
+insertNode v Leaf = Node 0 Leaf v Leaf
+insertNode v (Node h l c r)
+  | height l <= height r = setNodeHeight $ Node h (insertNode v l) c r
+  | otherwise = setNodeHeight $ Node h l c (insertNode v r)
+
 foldTree :: [a] -> Tree a
-foldTree = error "Week04.Soln#foldTree not implemented"
+foldTree = foldr insertNode Leaf
 
 showTree :: Show a => Tree a -> String
 showTree Leaf = ""
 showTree n@(Node s _ _ _) = go s n
   where
-  go _ (Leaf) = ""
+  go _ Leaf = ""
   go i (Node h l c r) = go (i-1) l ++
     replicate (4*fromIntegral i) ' ' ++ show c ++ "-" ++ show h ++ "\n" ++ go (i-1) r
 
@@ -57,22 +77,21 @@ printTree t = putStrLn $ showTree t
 ---------------------------  Exercise 3
 
 xor :: [Bool] -> Bool
-xor = error "Week04.Soln#xor not implemented"
+xor = foldr (/=) False
 
 -- impl using foldr
 map' :: (a -> b) -> [a] -> [b]
-map' = error "Week04.Soln#map' not implemented"
+map' f = foldr (\a bs -> f a : bs) []
 
 -- impl using foldr
 myFoldl :: (a -> b -> a) -> a -> [b] -> a
-myFoldl = error "Week04.Soln#myFoldl not implemented"
+myFoldl f = foldr (flip f)
 
 ---------------------------  Exercise 4
 -- See: https://en.wikipedia.org/wiki/Sieve_of_Sundaram
--- cartProd provided for you to use in your solution
-
-cartProd :: [a] -> [b] -> [(a, b)]
-cartProd xs ys = [(x,y) | x <- xs, y <- ys]
 
 sieveSundaram :: Integer -> [Integer]
-sieveSundaram = error "Week04.Soln#sieveSundaram not implemented"
+sieveSundaram n = map ((+1) . (*2)) $ [1..n] \\ calcNonPrimes n'
+  where
+    n' = n `div` 2
+    calcNonPrimes n'' = [i + j + 2 * i * j | i <- [1..n''], j <- [i..n'']]
