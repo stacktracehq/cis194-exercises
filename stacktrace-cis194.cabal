@@ -23,9 +23,17 @@ library
     Week05.Parser
     Week05.StackVM
     Week06.Fibonacci
+    Week07.Buffer
+    Week07.Editor
+    Week07.Sized
+    Week07.JoinList
+    Week07.Scrabble
+  ghc-options:
+    -Wall
   build-depends:
     base >=4.10 && <5,
-    containers
+    containers,
+    mtl
   hs-source-dirs:
     src
   default-language:
@@ -42,6 +50,7 @@ test-suite spec
     Week04.SolnSpec
     Week05.CalcSpec
     Week06.FibonacciSpec
+    Week07.JoinListSpec
   hs-source-dirs:
     test
   default-extensions:
