@@ -17,8 +17,9 @@ module Week07.JoinList
 
 import Week07.Buffer (Buffer(..))
 import Week07.Editor (editor, runEditor)
-import Week07.Scrabble (Score(..))
-import Week07.Sized (Sized(..), Size(..))
+import Week07.Scrabble (Score(..), scoreString)
+import Week07.Sized (Sized(..), Size(..), getSize)
+import Data.Monoid
 
 data JoinList m a
   = Empty
@@ -42,26 +43,47 @@ joinListToList (Append _ l r) = joinListToList l ++ joinListToList r
 -- Suggestion (no tests):
 -- Pulls the monoidal value out of the root of the JoinList
 tag :: Monoid m => JoinList m a -> m
-tag = error "Week07.JoinList#tag not implemented"
+tag Empty = mempty
+tag (Single m _) = m
+tag (Append m _ _) = m
 
 (+++) :: Monoid m => JoinList m a -> JoinList m a -> JoinList m a
-(+++) = error "Week07.JoinList#(+++) not implemented"
+(+++) x y = Append (tag x <> tag y) x y
 
 --------------------------- Exercise 2
 
 indexJ :: (Sized b, Monoid b) => Int -> JoinList b a -> Maybe a
-indexJ = error "Week07.JoinList#indexJ not implemented"
+indexJ _ Empty = Nothing
+indexJ i _ | i < 0 = Nothing
+indexJ i (Single _ _) | i > 0 = Nothing
+indexJ i (Single _ _) | i > 0 = Nothing
+indexJ _ (Single _ a) = Just a
+indexJ i (Append _ x y) 
+  | Size i < size (tag x) = indexJ i x
+  | otherwise = indexJ (i - getSize (size (tag x))) y
 
 dropJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
-dropJ = error "Week07.JoinList#dropJ not implemented"
+dropJ 0 x = x
+dropJ _ Empty = Empty
+dropJ _ (Single _ _) = Empty
+dropJ i (Append m _ _) | i >= getSize (size m) = Empty
+dropJ i (Append _ x y)
+  | Size i < size (tag x) = dropJ i x +++ y
+  | otherwise = dropJ (i - getSize (size (tag x))) y
 
 takeJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
-takeJ = error "Week07.JoinList#takeJ not implemented"
+takeJ 0 _ = Empty
+takeJ _ Empty = Empty
+takeJ i x | i >= getSize (size (tag x)) = x
+takeJ _ x@(Single _ _) = x
+takeJ i (Append _ x y)
+  | Size i < size (tag x) = takeJ i x
+  | otherwise = x +++ takeJ (i - getSize (size (tag x))) y
 
 --------------------------- Exercise 3
 
 scoreLine :: String -> JoinList Score String
-scoreLine = error "Week07.JoinList#scoreLine not implemented"
+scoreLine s = Single (scoreString s) s
 
 --------------------------- Exercise 4
 
