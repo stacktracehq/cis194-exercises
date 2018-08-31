@@ -81,19 +81,19 @@ instance Fractional (Stream Integer) where
   (/) a@(Cons a0 a') b@(Cons b0 b') = Cons (a0 `div` b0) (fromInteger (1 `div` b0) * (a' - (a / b) * b'))
 
 fibs3 :: Stream Integer
-fibs3 = x / (1 - x - x^2)
+fibs3 = x / (1 - x - x ^ (2 :: Int))
 
 --------------------------- Exercise 7
 
 newtype Matrix = Matrix [[Integer]]
 
 instance Num Matrix where
-  (*) (Matrix x) (Matrix y) = Matrix (map (\xi -> map (vectorMultiply xi) y') x)
-    where y' = transpose y
-          vectorMultiply a b = sum (zipWith (*) a b)
+  (*) (Matrix a) (Matrix b) = Matrix (map (\ai -> map (vectorMultiply ai) b') a)
+    where b' = transpose b
+          vectorMultiply c d = sum (zipWith (*) c d)
 
 instance Show Matrix where
-  show (Matrix x) = show x
+  show (Matrix a) = show a
 
 fib4 :: Integer -> Integer
 fib4 0 = 0
