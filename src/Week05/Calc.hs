@@ -16,16 +16,19 @@ import Week05.ExprT
 import Week05.Parser
 import qualified Week05.StackVM as SVM
 import qualified Data.Map as M
+import Data.Maybe
 
 --------------------------------------------------- Exercise 1
 
 eval :: ExprT -> Integer
-eval = error "Week05.Calc#eval not implemented"
+eval (Lit x) = x
+eval (Add x y) = eval x + eval y
+eval (Mul x y) = eval x * eval y
 
 --------------------------------------------------- Exercise 2
 
 evalStr :: String -> Maybe Integer
-evalStr = error "Week05.Calc#evalStr not implemented"
+evalStr = (eval <$>) . parseExp Lit Add Mul
 
 --------------------------------------------------- Exercise 3
 
@@ -37,45 +40,45 @@ class Expr a where
 
 -- now write an instance for our ExprT type
 instance Expr ExprT where
-  lit = error "Week05.Calc#lit not implemented for ExprT"
-  add = error "Week05.Calc#add not implemented for ExprT"
-  mul = error "Week05.Calc#mul not implemented for ExprT"
+  lit = Lit
+  add = Add
+  mul = Mul
 
 --------------------------------------------------- Exercise 4
 -- Write instances for Integer, Bool, MinMax, and Mod7
 
-newtype MinMax = MinMax Integer deriving (Eq, Show)
+newtype MinMax = MinMax Integer deriving (Eq, Show, Ord)
 newtype Mod7 = Mod7 Integer deriving (Eq, Show)
 
 instance Expr Integer where
-  lit = error "Week05.Calc#lit not implemented for Integer"
-  add = error "Week05.Calc#lit not implemented for Integer"
-  mul = error "Week05.Calc#lit not implemented for Integer"
+  lit = id
+  add = (+)
+  mul = (*)
 
 instance Expr Bool where
-  lit = error "Week05.Calc#lit not implemented for Bool"
-  add = error "Week05.Calc#add not implemented for Bool"
-  mul = error "Week05.Calc#mul not implemented for Bool"
+  lit = (> 0)
+  add = (||)
+  mul = (&&)
 
 instance Expr MinMax where
-  lit = error "Week05.Calc#lit not implemented for MinMax"
-  add = error "Week05.Calc#add not implemented for MinMax"
-  mul = error "Week05.Calc#mul not implemented for MinMax"
+  lit = MinMax
+  add = max
+  mul = min
 
 instance Expr Mod7 where
-  lit = error "Week05.Calc#lit not implemented for Mod7"
-  add = error "Week05.Calc#add not implemented for Mod7"
-  mul = error "Week05.Calc#mul not implemented for Mod7"
+  lit = Mod7 . (`mod` 7)
+  add (Mod7 x) (Mod7 y) = lit (x + y)
+  mul (Mod7 x) (Mod7 y) = lit (x * y)
 
 --------------------------------------------------- Exercise 5
 
 instance Expr SVM.Program where
-  lit = error "Week05.Calc#mul not implemented for Program"
-  add = error "Week05.Calc#mul not implemented for Program"
-  mul = error "Week05.Calc#mul not implemented for Program"
+  lit x = [ SVM.PushI x ]
+  mul x y = x ++ y ++ [ SVM.Mul ]
+  add x y = x ++ y ++ [ SVM.Add ]
 
 compile :: String -> SVM.Program
-compile = error "Week05.Calc#compile not implemented"
+compile = fromMaybe [] . parseExp lit add mul
 
 --------------------------------------------------- Exercise 6
 
@@ -89,17 +92,17 @@ data VarExprT = LitWithVar Integer
   deriving (Show, Eq)
 
 instance Expr VarExprT where
-  lit = error "Week05.Calc#lit not implemented for VarExprT"
-  add = error "Week05.Calc#add not implemented for VarExprT"
-  mul = error "Week05.Calc#mul not implemented for VarExprT"
+  lit = LitWithVar
+  add = AddWithVar
+  mul = MulWithVar
 
 instance HasVars VarExprT where
-  var = error "Week05.Calc#var not implemented for VarExprT"
+  var = Var
 
 instance HasVars (M.Map String Integer -> Maybe Integer) where
-  var = error "Week05.Calc#var not implemented for (M.Map String Integer -> Maybe Integer)"
+  var x = (M.!? x)
 
 instance Expr (M.Map String Integer -> Maybe Integer) where
-  lit = error "Week05.Calc#lit not implemented for (M.Map String Integer -> Maybe Integer)"
-  add = error "Week05.Calc#add not implemented for (M.Map String Integer -> Maybe Integer)"
-  mul = error "Week05.Calc#mul not implemented for (M.Map String Integer -> Maybe Integer)"
+  lit x _ = Just x
+  add fx fy m = (+) <$> fx m <*> fy m
+  mul fx fy m  = (*) <$> fx m <*> fy m

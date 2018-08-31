@@ -18,19 +18,34 @@ import Week02.Log
   )
 
 parseMessage :: String -> LogMessage
-parseMessage = error "Week02.LogAnalysis#parseMessage not implemented"
+parseMessage line = case words line of
+  "E" : severity : timeStamp : message -> LogMessage (Error (read severity)) (read timeStamp) (unwords message)
+  "W" : timeStamp : message -> LogMessage Warning (read timeStamp) (unwords message)
+  "I" : timeStamp : message -> LogMessage Info (read timeStamp) (unwords message)
+  _ -> Unknown line
 
 parse :: String -> [LogMessage]
-parse = error "Week02.LogAnalysis#parse not implemented"
+parse = map parseMessage . lines
 
 insert :: LogMessage -> MessageTree -> MessageTree
-insert = error "Week02.LogAnalysis#insert not implemented"
+insert (Unknown _) tree = tree
+insert message Leaf = Node Leaf message Leaf
+insert message @ (LogMessage _ timeStamp _) (Node left nodeMessage @ (LogMessage _ nodeTimeStamp _) right)
+  | timeStamp < nodeTimeStamp = Node (insert message left) nodeMessage right
+  | otherwise = Node left nodeMessage (insert message right)
+insert LogMessage{} (Node _ (Unknown _) _) = error "Not possible"
 
 build :: [LogMessage] -> MessageTree
-build = error "Week02.LogAnalysis#build not implemented"
+build = foldr insert Leaf . reverse
 
 inOrder :: MessageTree -> [LogMessage]
-inOrder = error "Week02.LogAnalysis#inOrder not implemented"
+inOrder Leaf = []
+inOrder (Node left message right) = inOrder left ++ [message] ++ inOrder right
+
+isImportant :: LogMessage -> Bool
+isImportant (LogMessage (Error severity) _ _)
+  | severity >= 50 = True
+isImportant _ = False
 
 whatWentWrong :: [LogMessage] -> [String]
-whatWentWrong = error "Week02.LogAnalysis#whatWentWrong not implemented"
+whatWentWrong = map (\(LogMessage _ _ message) -> message) . filter isImportant . inOrder . build
