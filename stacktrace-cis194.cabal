@@ -51,6 +51,7 @@ test-suite spec
     Week05.CalcSpec
     Week06.FibonacciSpec
     Week07.JoinListSpec
+    Week08.PartySpec
   hs-source-dirs:
     test
   default-extensions:
