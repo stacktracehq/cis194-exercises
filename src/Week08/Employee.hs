@@ -59,8 +59,8 @@ instance Ord GuestList where
 
 instance Semigroup GuestList where
   (<>) :: GuestList -> GuestList -> GuestList
-  (<>) = error "Week08.Party#Monoid(GuestList)#mappend not implemented"
+  (<>) (GL guests fun) (GL guests' fun') = GL (guests ++ guests') (fun + fun')
 
 instance Monoid GuestList where
   mempty :: GuestList
-  mempty = error "Week08.Party#Monoid(GuestList)#mempty not implemented"
+  mempty = GL [] 0
