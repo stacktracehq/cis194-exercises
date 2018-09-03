@@ -48,6 +48,8 @@ tag (Single m _) = m
 tag (Append m _ _) = m
 
 (+++) :: Monoid m => JoinList m a -> JoinList m a -> JoinList m a
+(+++) Empty y = y
+(+++) x Empty = x
 (+++) x y = Append (tag x <> tag y) x y
 
 --------------------------- Exercise 2
@@ -89,29 +91,34 @@ scoreLine s = Single (scoreString s) s
 
 instance Buffer (JoinList (Score, Size) String) where
   toString :: JoinList (Score, Size) String -> String
-  toString = error "Week07.JoinList#toString not implemented for Buffer (JoinList (Score, Size) String)"
+  toString = concat . joinListToList
 
   fromString :: String -> JoinList (Score, Size) String
-  fromString = error "Week07.JoinList#fromString not implemented for Buffer (JoinList (Score, Size) String)"
+  fromString = foldr (\x acc -> Single (scoreString x, Size 1) x +++ acc) Empty . lines
 
   line :: Int -> JoinList (Score, Size) String -> Maybe String
-  line = error "Week07.JoinList#line not implemented for Buffer (JoinList (Score, Size) String)"
+  line = indexJ
 
   replaceLine ::
        Int
     -> String
     -> JoinList (Score, Size) String
     -> JoinList (Score, Size) String
-  replaceLine = error "Week07.JoinList#replaceLine not implemented for Buffer (JoinList (Score, Size) String)"
+  replaceLine i s j = takeJ (numLines j) (takeJ i j +++ fromString s +++ dropJ (i + 1) j)
 
   numLines :: JoinList (Score, Size) String -> Int
-  numLines = error "Week07.JoinList#numLines not implemented for Buffer (JoinList (Score, Size) String)"
+  numLines = getSize . snd . tag
 
   value :: JoinList (Score, Size) String -> Int
-  value = error "Week07.JoinList#value not implemented for Buffer (JoinList (Score, Size) String)"
+  value = getScore . fst . tag
 
 initialValue :: JoinList (Score, Size) String
-initialValue = error "Week07.JoinList#initialValue not implemented"
+initialValue =  fromString $ unlines 
+  [ "This buffer is for notes you don't want to save, and for"
+  , "evaluation of steam valve coefficients."
+  , "To load a different file, type the character L followed"
+  , "by the name of the file."
+  ]
 
 main :: IO ()
 main =
