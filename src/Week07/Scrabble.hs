@@ -50,4 +50,4 @@ score c = case toLower c of
   _ -> mempty
 
 scoreString :: String -> Score
-scoreString = foldr ((<>) . score) mempty
+scoreString = foldMap score

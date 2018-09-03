@@ -1,6 +1,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE TupleSections #-}
 
 module Week07.JoinList
   ( JoinList(..)
@@ -114,7 +115,7 @@ replaceJ i v t
 --------------------------- Exercise 3
 
 scoreLine :: String -> JoinList Score String
-scoreLine s = Single (scoreString s) s
+scoreLine = Single =<< scoreString
 
 --------------------------- Exercise 4
 
@@ -123,9 +124,9 @@ instance Buffer (JoinList (Score, Size) String) where
   toString = concat . joinListToList
 
   fromString :: String -> JoinList (Score, Size) String
-  fromString s = foldr ((+++) . scoreLineWithSize) Empty (lines s)
+  fromString = foldr ((+++) . scoreLineWithSize) Empty . lines
     where
-      scoreLineWithSize l = Single (scoreString l, Size 1) l
+      scoreLineWithSize = Single =<< (, Size 1)  . scoreString
 
   line :: Int -> JoinList (Score, Size) String -> Maybe String
   line = indexJ
@@ -135,7 +136,7 @@ instance Buffer (JoinList (Score, Size) String) where
     -> String
     -> JoinList (Score, Size) String
     -> JoinList (Score, Size) String
-  replaceLine i v = replaceJ i (fromString v)
+  replaceLine i = replaceJ i . fromString
 
   numLines :: JoinList (Score, Size) String -> Int
   numLines = getSize . snd . tag
