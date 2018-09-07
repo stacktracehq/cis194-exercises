@@ -119,7 +119,7 @@ buildSpec =
             , messageG
             , messageB
             ]
-      let expectedOne = Node Leaf messageA (Node (Node Leaf messageB Leaf) messageG Leaf)
+      let expectedOne = Node (Node Leaf messageA Leaf) messageB (Node Leaf messageG Leaf)
       build inputOne `shouldBe` expectedOne
 
       let inputTwo =
@@ -127,7 +127,7 @@ buildSpec =
             , messageA
             , messageD
             ]
-      let expectedTwo = Node (Node Leaf messageA Leaf) messageC (Node Leaf messageD Leaf)
+      let expectedTwo = Node (Node Leaf messageA (Node Leaf messageC Leaf)) messageD Leaf
       build inputTwo`shouldBe` expectedTwo
 
 inOrderSpec :: Spec

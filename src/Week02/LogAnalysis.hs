@@ -18,19 +18,42 @@ import Week02.Log
   )
 
 parseMessage :: String -> LogMessage
-parseMessage = error "Week02.LogAnalysis#parseMessage not implemented"
+parseMessage input =
+  case words input of
+    "I":time:content -> LogMessage Info (read time) (unwords content)
+    "W":time:content -> LogMessage Warning (read time) (unwords content)
+    "E":level:time:content ->
+      LogMessage (Error (read level)) (read time) (unwords content)
+    _ -> Unknown input
+
+timeStamp :: LogMessage -> TimeStamp
+timeStamp (LogMessage _ t _) = t
+timeStamp (Unknown _) = 0
+
+message :: LogMessage -> String
+message (Unknown m) = m
+message (LogMessage _ _ m) = m
+
+severity :: LogMessage -> Int
+severity (LogMessage (Error s) _ _) = s
+severity _ = 0
 
 parse :: String -> [LogMessage]
-parse = error "Week02.LogAnalysis#parse not implemented"
+parse = map parseMessage . lines
 
 insert :: LogMessage -> MessageTree -> MessageTree
-insert = error "Week02.LogAnalysis#insert not implemented"
+insert Unknown {} t = t
+insert a Leaf = Node Leaf a Leaf
+insert a (Node l b r)
+  | timeStamp a < timeStamp b = Node (insert a l) b r
+  | otherwise = Node l b (insert a r)
 
 build :: [LogMessage] -> MessageTree
-build = error "Week02.LogAnalysis#build not implemented"
+build = foldr insert Leaf
 
 inOrder :: MessageTree -> [LogMessage]
-inOrder = error "Week02.LogAnalysis#inOrder not implemented"
+inOrder Leaf = []
+inOrder (Node l m r) = inOrder l ++ [m] ++ inOrder r
 
 whatWentWrong :: [LogMessage] -> [String]
-whatWentWrong = error "Week02.LogAnalysis#whatWentWrong not implemented"
+whatWentWrong = map message . filter ((> 50) . severity) . inOrder . build
