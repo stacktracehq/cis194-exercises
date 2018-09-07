@@ -6,18 +6,9 @@ module Week08.PartySpec
 import Data.Monoid ((<>))
 import Data.Tree (Tree(..))
 import System.IO.Unsafe (unsafePerformIO)
-import Test.Hspec (Spec, context, describe, hspec, it, shouldBe)
-import Week08.Employee
-  ( Employee(..)
-  , Fun
-  , GuestList(..)
-  )
-import Week08.Party
-  ( glCons
-  , moreFun
-  , nextLevel
-  , maxFun
-  )
+import Test.Hspec (Spec, describe, hspec, it, shouldBe)
+import Week08.Employee (Employee(..), Fun, GuestList(..))
+import Week08.Party (glCons, maxFun, moreFun, nextLevel)
 
 spec :: Spec
 spec =
