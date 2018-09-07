@@ -28,6 +28,8 @@ library
     Week07.Sized
     Week07.JoinList
     Week07.Scrabble
+    Week08.Party
+    Week08.Employee
   ghc-options:
     -Wall
   build-depends:
