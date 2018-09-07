@@ -7,19 +7,22 @@ module Week08.Party
   ) where
 
 import Week08.Employee (GuestList(..), Employee(..))
-import Data.Tree (Tree)
+import Data.Tree (Tree, foldTree)
+import Control.Arrow ((&&&))
+import Control.Applicative (liftA2)
+import Data.Monoid ((<>))
 
 --------------------------- Exercise 1
 
 glCons :: Employee -> GuestList -> GuestList
-glCons = error "Week08.Party#glCons not implemented"
+glCons = (<>) . liftA2 GL pure empFun
 
 -- See src/Week08/Employee.hs to implement
 -- the monoid instance for GuestList.
 -- Avoids orphans.
 
 moreFun :: GuestList -> GuestList -> GuestList
-moreFun = error "Week08.Party#moreFun not implemented"
+moreFun = max
 
 --------------------------- Exercise 2
 
@@ -28,14 +31,21 @@ moreFun = error "Week08.Party#moreFun not implemented"
 --------------------------- Exercise 3
 
 nextLevel :: Employee -> [(GuestList, GuestList)] -> (GuestList, GuestList)
-nextLevel = error "Week08.Party#nextLevel not implemented"
+nextLevel e = (glCons e . snd &&& fst) . mconcat
 
 --------------------------- Exercise 4
 
 maxFun :: Tree Employee -> GuestList
-maxFun = error "Week08.Party#maxFun not implemented"
+maxFun = uncurry moreFun . foldTree nextLevel
 
 --------------------------- Exercise 5
 
 main :: IO ()
-main = putStrLn "Do the thing"
+main =
+  do
+    guests <- maxFun . read <$> readFile "../resources/Week08/company.txt"
+    putStrLn $ "Total Fun: " ++ totalFun guests
+    putStr $ empNames guests
+  where
+    totalFun = show . glFun
+    empNames = unlines . map empName . glGuests

@@ -3,6 +3,9 @@
 module Week08.Employee where
 
 import Data.Tree (Tree(..))
+import Data.Monoid (Monoid(..))
+import Control.Arrow ((***))
+import Control.Monad (join)
 
 -- Employee names are represented by Strings.
 type Name = String
@@ -59,8 +62,13 @@ instance Ord GuestList where
 
 instance Semigroup GuestList where
   (<>) :: GuestList -> GuestList -> GuestList
-  (<>) = error "Week08.Party#Monoid(GuestList)#mappend not implemented"
+  (<>) a b = appendEmployees guestLists `GL` sumFun guestLists
+    where
+      guestLists = (a, b)
+      appendEmployees = uncurry (<>) . mapTuple glGuests
+      sumFun = uncurry (+) . mapTuple glFun
+      mapTuple = join (***)
 
 instance Monoid GuestList where
   mempty :: GuestList
-  mempty = error "Week08.Party#Monoid(GuestList)#mempty not implemented"
+  mempty = GL mempty 0
