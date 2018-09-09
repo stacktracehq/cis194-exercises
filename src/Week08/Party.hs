@@ -7,19 +7,20 @@ module Week08.Party
   ) where
 
 import Week08.Employee (GuestList(..), Employee(..))
-import Data.Tree (Tree)
+import Data.Tree (Tree, foldTree)
+import Data.List (sort)
 
 --------------------------- Exercise 1
 
 glCons :: Employee -> GuestList -> GuestList
-glCons = error "Week08.Party#glCons not implemented"
+glCons e@Emp{empFun = existingFun} (GL es fun) = GL (e:es) (existingFun + fun)
 
 -- See src/Week08/Employee.hs to implement
 -- the monoid instance for GuestList.
 -- Avoids orphans.
 
 moreFun :: GuestList -> GuestList -> GuestList
-moreFun = error "Week08.Party#moreFun not implemented"
+moreFun = max
 
 --------------------------- Exercise 2
 
@@ -28,14 +29,20 @@ moreFun = error "Week08.Party#moreFun not implemented"
 --------------------------- Exercise 3
 
 nextLevel :: Employee -> [(GuestList, GuestList)] -> (GuestList, GuestList)
-nextLevel = error "Week08.Party#nextLevel not implemented"
+nextLevel e subs = (glCons e (mconcat (snd <$> subs)), mconcat (fst <$> subs))
 
 --------------------------- Exercise 4
 
 maxFun :: Tree Employee -> GuestList
-maxFun = error "Week08.Party#maxFun not implemented"
+maxFun = uncurry moreFun . foldTree nextLevel
 
 --------------------------- Exercise 5
 
 main :: IO ()
-main = putStrLn "Do the thing"
+main = do
+  content <- readFile "resources/Week08/company.txt"
+  let funGuestList = maxFun $ read content
+  let fun = glFun funGuestList
+  let sortedEmpoyees = sort (empName <$> glGuests funGuestList)
+  putStrLn ("Total fun: " ++ show fun)
+  mconcat (putStrLn <$> sortedEmpoyees)
