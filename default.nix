@@ -1,2 +1,8 @@
-{ nixpkgs ? import ./nixpkgs.nix {} }:
-nixpkgs.haskellPackages.callPackage ./package.nix {}
+{ compiler ? "default"
+}:
+let
+  packages = import ./nix/packages {
+    inherit compiler;
+  };
+in
+  packages.haskellPackages.callPackage ./package.nix {}

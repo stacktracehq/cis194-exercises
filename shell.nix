@@ -1,16 +1,14 @@
-{ nixpkgs ? import ./nixpkgs.nix {}
+{ compiler ? "default"
 }:
 let
-  package = import ./. {
-    inherit nixpkgs;
+  packages = import ./nix/packages {
+    inherit compiler;
   };
-  withTools = nixpkgs.haskell.lib.addBuildDepends
-    package
-    [
-      nixpkgs.haskellPackages.cabal-install
-      nixpkgs.haskellPackages.ghcid
-      nixpkgs.haskellPackages.hindent
-      nixpkgs.haskellPackages.hlint
-    ];
+
+  tools = import ./nix/tools.nix packages;
+
+  package = import ./. {
+    inherit compiler;
+  };
 in
-  withTools.env
+  (packages.haskell.lib.addBuildDepends package tools).env
