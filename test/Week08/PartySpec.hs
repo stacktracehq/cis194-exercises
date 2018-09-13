@@ -3,7 +3,6 @@ module Week08.PartySpec
   , hspec
   ) where
 
-import Data.Monoid ((<>))
 import Data.Tree (Tree(..))
 import System.IO.Unsafe (unsafePerformIO)
 import Test.Hspec (Spec, describe, hspec, it, shouldBe)

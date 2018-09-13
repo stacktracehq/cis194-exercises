@@ -3,7 +3,6 @@
 module Week08.Employee where
 
 import Data.Tree (Tree(..))
-import Data.Monoid (Monoid(..))
 
 -- Employee names are represented by Strings.
 type Name = String
@@ -58,9 +57,10 @@ data GuestList =
 instance Ord GuestList where
   compare (GL _ f1) (GL _ f2) = compare f1 f2
 
+instance Semigroup GuestList where
+  (<>) :: GuestList -> GuestList -> GuestList
+  (<>) = error "Week08.Party#Monoid(GuestList)#mappend not implemented"
+
 instance Monoid GuestList where
   mempty :: GuestList
   mempty = error "Week08.Party#Monoid(GuestList)#mempty not implemented"
-
-  mappend :: GuestList -> GuestList -> GuestList
-  mappend = error "Week08.Party#Monoid(GuestList)#mappend not implemented"
