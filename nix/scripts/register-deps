@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+expression=$(cat <<-NIX
+with import ./nix/packages/nixpkgs {};
+stdenv.mkDerivation {
+  name = "temp-cabal2nix";
+  buildInputs = [
+    haskellPackages.cabal2nix
+  ];
+}
+NIX
+)
+
+nix-shell \
+  --expr "$expression" \
+  --run 'cabal2nix . > package.nix'

@@ -3,8 +3,8 @@ module Week07.JoinListSpec
   , hspec
   ) where
 
-import Data.Monoid (Product(..), (<>))
-import Test.Hspec (Spec, context, describe, hspec, it, shouldBe)
+import Data.Monoid (Product(..))
+import Test.Hspec (Spec, describe, hspec, it, shouldBe)
 import Week07.JoinList
   ( JoinList(..)
   , (!!?)
