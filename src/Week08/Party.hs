@@ -15,7 +15,7 @@ import Data.Monoid ((<>))
 --------------------------- Exercise 1
 
 glCons :: Employee -> GuestList -> GuestList
-glCons = (<>) . liftA2 GL pure empFun
+glCons = (<>) . (GL <$> pure <*> empFun)
 
 -- See src/Week08/Employee.hs to implement
 -- the monoid instance for GuestList.
