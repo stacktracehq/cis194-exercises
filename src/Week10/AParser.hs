@@ -11,8 +11,10 @@ module Week10.AParser
   , intOrUppercase
   ) where
 
+import Data.Functor (void)
 import Control.Applicative (Alternative(..))
-import Data.Char (isDigit)
+import Data.Char (isDigit, isUpper)
+import Data.Bifunctor (first)
 
 newtype Parser a = Parser
   { runParser :: String -> Maybe (a, String)
@@ -42,38 +44,46 @@ posInt = Parser f
 
 instance Functor Parser where
   fmap :: (a -> b) -> Parser a -> Parser b
-  fmap = error "Week10.AParser#fmap not implemented"
+  fmap f (Parser p) = Parser $ fmap (first f) . p
 
 ---------------------------  Exercise 2
 
 instance Applicative Parser where
   pure :: a -> Parser a
-  pure = error "Week10.AParser#pure not implemented"
+  pure a = Parser $ \input -> Just (a, input)
 
   (<*>) :: Parser (a -> b) -> Parser a -> Parser b
-  (<*>) = error "Week10.AParser#(<*>) not implemented"
+  (Parser pf) <*> (Parser pa) = Parser $ \s -> do
+    (f, s') <- pf s
+    (a, s'') <- pa s'
+    return (f a, s'')
 
 ---------------------------  Exercise 3
 
 abParser :: Parser (Char, Char)
-abParser = error "Week10.AParser#abParser not implemented"
+abParser = (,) <$> char 'a' <*> char 'b'
 
 abParser_ :: Parser ()
-abParser_ = error "Week10.AParser#abParser_ not implemented"
+abParser_ = void abParser
+
+int :: Parser Int
+int = fromInteger <$> posInt
 
 intPair :: Parser [Int]
-intPair = error "Week10.AParser#intPair not implemented"
+intPair = (\a b -> [a, b]) <$> int <*> (char ' ' *> int)
 
 ---------------------------  Exercise 4
 
 instance Alternative Parser where
   empty :: Parser a
-  empty = error "Week10.AParser#empty not implemented"
+  empty = Parser $ const Nothing
 
   (<|>) :: Parser a -> Parser a -> Parser a
-  (<|>) = error "Week10.AParser#(<|>) not implemented"
+  (Parser a) <|> (Parser b) = Parser $ \input ->
+    a input <|> b input
 
 ---------------------------  Exercise 5
 
 intOrUppercase :: Parser ()
-intOrUppercase = error "Week10.AParser#intOrUppercase not implemented"
+intOrUppercase =
+  void posInt <|> void (satisfy isUpper)
