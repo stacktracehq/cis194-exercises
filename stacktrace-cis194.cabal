@@ -64,7 +64,9 @@ test-suite spec
   build-depends:
     base >=4.10 && <5,
     containers,
+    hedgehog,
     hspec,
+    hw-hspec-hedgehog,
     stacktrace-cis194
   default-language:
     Haskell2010
