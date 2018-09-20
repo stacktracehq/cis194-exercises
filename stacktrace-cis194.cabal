@@ -30,6 +30,7 @@ library
     Week07.Scrabble
     Week08.Party
     Week08.Employee
+    Week10.AParser
   ghc-options:
     -Wall
   build-depends:
@@ -54,6 +55,7 @@ test-suite spec
     Week06.FibonacciSpec
     Week07.JoinListSpec
     Week08.PartySpec
+    Week10.AParserSpec
   hs-source-dirs:
     test
   default-extensions:

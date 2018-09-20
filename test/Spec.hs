@@ -11,6 +11,7 @@ import qualified Week05.CalcSpec
 import qualified Week06.FibonacciSpec
 import qualified Week07.JoinListSpec
 import qualified Week08.PartySpec
+import qualified Week10.AParserSpec
 
 spec :: Spec
 spec =  do
@@ -22,6 +23,7 @@ spec =  do
   Week06.FibonacciSpec.spec
   Week07.JoinListSpec.spec
   Week08.PartySpec.spec
+  Week10.AParserSpec.spec
 
 main :: IO ()
 main = hspec spec
