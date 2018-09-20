@@ -8,8 +8,6 @@ module Week02.Log
   , testWhatWentWrong
   ) where
 
-import Control.Applicative
-
 data MessageType
   = Info
   | Warning

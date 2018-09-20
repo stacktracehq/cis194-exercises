@@ -2,7 +2,6 @@
 
 module Week07.Editor where
 
-import Control.Applicative
 import Control.Arrow (first, second)
 import Control.Exception
 import Control.Monad.State

@@ -6,7 +6,6 @@ import Control.Applicative hiding (Const)
 import Control.Arrow
 import Control.Monad (void)
 import Data.Char
-import Data.Monoid
 import Data.List (foldl')
 
 -- Building block of a computation with some state of type @s@
