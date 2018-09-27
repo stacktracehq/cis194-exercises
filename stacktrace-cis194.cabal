@@ -31,6 +31,8 @@ library
     Week08.Party
     Week08.Employee
     Week10.AParser
+    Week11.AParser
+    Week11.SExpr
   ghc-options:
     -Wall
   build-depends:
@@ -56,6 +58,7 @@ test-suite spec
     Week07.JoinListSpec
     Week08.PartySpec
     Week10.AParserSpec
+    Week11.SExprSpec
   hs-source-dirs:
     test
   default-extensions:
