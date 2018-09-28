@@ -8,19 +8,19 @@ import Week11.AParser (Parser, satisfy, char, posInt)
 --  Exercise 1: Parsing repetitions
 ------------------------------------------------------------
 zeroOrMore :: Parser a -> Parser [a]
-zeroOrMore = error "Week11.SExpr#zeroOrMore not implemented"
+zeroOrMore pA = oneOrMore pA <|> pure []
 
 oneOrMore :: Parser a -> Parser [a]
-oneOrMore = error "Week11.SExpr#oneOrMore not implemented"
+oneOrMore pA = (:) <$> pA <*> zeroOrMore pA
 
 ------------------------------------------------------------
 --  Exercise 2: Utilities
 ------------------------------------------------------------
 spaces :: Parser String
-spaces = error "Week11.SExpr#spaces not implemented"
+spaces = zeroOrMore (satisfy isSpace)
 
 ident :: Parser String
-ident = error "Week11.SExpr#ident not implemented"
+ident = (:) <$> satisfy isAlpha <*> zeroOrMore (satisfy isAlphaNum)
 
 ------------------------------------------------------------
 --  Exercise 3: Parsing S-expressions
@@ -43,4 +43,10 @@ data SExpr
   deriving (Show, Eq)
 
 parseSExpr :: Parser SExpr
-parseSExpr = error "Week11.SExpr#parseSExpr not implemented"
+parseSExpr = spaces *> (atom <|> comb) <* spaces
+  where
+    atom = A <$> parseAtom
+    comb = Comb <$> (char '(' *> oneOrMore parseSExpr <* char ')')
+
+parseAtom :: Parser Atom
+parseAtom = (N <$> posInt) <|> (I <$> ident)
