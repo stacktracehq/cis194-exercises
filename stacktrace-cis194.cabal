@@ -33,6 +33,7 @@ library
     Week10.AParser
     Week11.AParser
     Week11.SExpr
+    Week12.Risk
   ghc-options:
     -Wall
   build-depends:
