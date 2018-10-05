@@ -40,7 +40,20 @@ data Battlefield = Battlefield
 -- Exercise 2
 
 battle :: Battlefield -> Rand StdGen Battlefield
-battle = error "Week12.Risk#battle not implemented"
+battle (Battlefield a d) =
+  let 
+    calculateOutcome (attackerRoll, defenderRoll) (attackerDeaths, defenderDeaths) =
+      if attackerRoll < defenderRoll 
+        then (attackerDeaths + 1, defenderDeaths) 
+        else (attackerDeaths, defenderDeaths + 1)
+  in
+    do 
+      attackerRolls <- replicateM (min 3 (max 0 (a - 1))) die
+      defenderRolls <- replicateM (min 2 d) die
+      let rolls = zip (sort attackerRolls) (sort defenderRolls)
+      let (attackerDeaths, defenderDeaths) = foldr calculateOutcome (0, 0) rolls
+      return (Battlefield (a - attackerDeaths) (d - defenderDeaths))
+
 
 ------------------------------------------------------------
 -- Exercise 3
