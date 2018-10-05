@@ -94,16 +94,16 @@ knownOutcomesSpec =
     describe "battle :: Battlefield -> Rand StdGen Battlefield" $ do
       it "random seed = 1, then Battlefield 12 10 => Battlefield 10 10" $
         evalRand (battle (Battlefield 12 10)) (mkStdGen 1) `shouldBe` Battlefield 10 10
-      it "random seed = 17, then Battlefield 65 59 => Battlefield 10 10" $
+      it "random seed = 17, then Battlefield 65 59 => Battlefield 65 57" $
         evalRand (battle (Battlefield 65 59)) (mkStdGen 17) `shouldBe` Battlefield 65 57
-      it "random seed = 456, then Battlefield 546 550 => Battlefield 10 10" $
+      it "random seed = 456, then Battlefield 546 550 => Battlefield 545 549" $
         evalRand (battle (Battlefield 546 550)) (mkStdGen 456) `shouldBe` Battlefield 545 549
     describe "invade :: Battlefield -> Rand StdGen Battlefield" $ do
-      it "random seed = 1, then Battlefield 12 10 => Battlefield 10 10" $
+      it "random seed = 1, then Battlefield 12 10 => Battlefield 1 5" $
         evalRand (invade (Battlefield 12 10)) (mkStdGen 1) `shouldBe` Battlefield 1 5
-      it "random seed = 17, then Battlefield 65 59 => Battlefield 10 10" $
+      it "random seed = 17, then Battlefield 65 59 => Battlefield 31 0" $
         evalRand (invade (Battlefield 65 59)) (mkStdGen 17) `shouldBe` Battlefield 31 0
-      it "random seed = 456, then Battlefield 546 550 => Battlefield 10 10" $
+      it "random seed = 456, then Battlefield 546 550 => Battlefield 8 0" $
         evalRand (invade (Battlefield 546 550)) (mkStdGen 456) `shouldBe` Battlefield 8 0
 
 compareTwo :: Double -> Double -> Double -> Bool
