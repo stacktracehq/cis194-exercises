@@ -4,7 +4,7 @@ module Week12.Risk where
 
 import Control.Monad.Random
 import Control.Arrow ((&&&))
-import Data.List (reverse, sort)
+import Data.List (reverse, sort, sortBy)
 
 ------------------------------------------------------------
 -- Die values
@@ -42,35 +42,42 @@ data Battlefield = Battlefield
 battle :: Battlefield -> Rand StdGen Battlefield
 battle (Battlefield a d) =
   let 
+    reverseSort = sortBy (flip compare)
     calculateOutcome (attackerRoll, defenderRoll) (attackerDeaths, defenderDeaths) =
-      if attackerRoll < defenderRoll 
+      if attackerRoll <= defenderRoll 
         then (attackerDeaths + 1, defenderDeaths) 
         else (attackerDeaths, defenderDeaths + 1)
   in
     do 
-      attackerRolls <- replicateM (min 3 (max 0 (a - 1))) die
+      attackerRolls <- replicateM (min 3 (a - 1)) die
       defenderRolls <- replicateM (min 2 d) die
-      let rolls = zip (sort attackerRolls) (sort defenderRolls)
+      let rolls = zip (reverseSort attackerRolls) (reverseSort defenderRolls)
       let (attackerDeaths, defenderDeaths) = foldr calculateOutcome (0, 0) rolls
       return (Battlefield (a - attackerDeaths) (d - defenderDeaths))
-
 
 ------------------------------------------------------------
 -- Exercise 3
 
 invade :: Battlefield -> Rand StdGen Battlefield
-invade = error "Week12.Risk#invade not implemented"
+invade b = 
+  do
+    b'@(Battlefield a d) <- battle b
+    if a < 2 || d == 0 then return b' else invade b'
 
 ------------------------------------------------------------
 -- Exercise 4
 
 successProb :: Battlefield -> Rand StdGen Double
-successProb = error "Week12.Risk#successProb not implemented"
+successProb b = 
+  let 
+    attackerDidWin (Battlefield _ d) = if d == 0 then 1 :: Double else 0
+    average xs = sum xs / fromIntegral (length xs)
+  in
+    do 
+      bs <- sequence (replicateM 1000 invade b)
+      return (average (attackerDidWin <$> bs))
 
 ------------------------------------------------------------
 -- Exercise 5
 
 -- Anyone know probability theory :p
-
-exactSuccessProb :: Battlefield -> Double
-exactSuccessProb = error "Week12.Risk#exactSuccessProb not implemented"
