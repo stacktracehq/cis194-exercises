@@ -3,13 +3,14 @@ module Week12.RiskSpec
   , hspec
   ) where
 
-import Control.Monad.Random (evalRandIO, replicateM)
+import Control.Monad.Random (evalRandIO, evalRand, replicateM)
 import Control.Monad.IO.Class (liftIO)
 import HaskellWorks.Hspec.Hedgehog (require)
 import Hedgehog (MonadGen(..), (===), assert, forAll, property)
 import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
-import Test.Hspec (Spec, describe, hspec, it, shouldBe, shouldSatisfy)
+import System.Random (StdGen, mkStdGen)
+import Test.Hspec (Spec, context, describe, hspec, it, shouldBe, shouldSatisfy)
 import Week12.Risk (Battlefield(..), battle, invade, successProb)
 
 spec :: Spec
@@ -17,6 +18,7 @@ spec =
   describe "Week 12" $ do
     battleSpec
     invadeSpec
+    knownOutcomesSpec
     successProbSpec
 
 unitsOnBattlefield :: Battlefield -> Int
@@ -86,6 +88,24 @@ invadeSpec =
         finalBattlefield <- liftIO (evalRandIO (invade initialBattlefield))
         assert (defendersTakeField finalBattlefield || attackersTakeField finalBattlefield)
 
+knownOutcomesSpec :: Spec
+knownOutcomesSpec =
+  context "known outcome tests, controlling random generation seed" $ do
+    describe "battle :: Battlefield -> Rand StdGen Battlefield" $ do
+      it "random seed = 1, then Battlefield 12 10 => Battlefield 10 10" $
+        evalRand (battle (Battlefield 12 10)) (mkStdGen 1) `shouldBe` Battlefield 10 10
+      it "random seed = 17, then Battlefield 65 59 => Battlefield 10 10" $
+        evalRand (battle (Battlefield 65 59)) (mkStdGen 17) `shouldBe` Battlefield 65 57
+      it "random seed = 456, then Battlefield 546 550 => Battlefield 10 10" $
+        evalRand (battle (Battlefield 546 550)) (mkStdGen 456) `shouldBe` Battlefield 545 549
+    describe "invade :: Battlefield -> Rand StdGen Battlefield" $ do
+      it "random seed = 1, then Battlefield 12 10 => Battlefield 10 10" $
+        evalRand (invade (Battlefield 12 10)) (mkStdGen 1) `shouldBe` Battlefield 1 5
+      it "random seed = 17, then Battlefield 65 59 => Battlefield 10 10" $
+        evalRand (invade (Battlefield 65 59)) (mkStdGen 17) `shouldBe` Battlefield 31 0
+      it "random seed = 456, then Battlefield 546 550 => Battlefield 10 10" $
+        evalRand (invade (Battlefield 546 550)) (mkStdGen 456) `shouldBe` Battlefield 8 0
+
 compareTwo :: Double -> Double -> Double -> Bool
 compareTwo a b t = (abs (a - b)) <= t
 
@@ -120,7 +140,7 @@ successProbSpec =
         defendingArmySize <- forAll $ Gen.int (Range.linear 8 10)
         let bf = Battlefield attackingArmySize defendingArmySize
         result <- liftIO (evalRandIO (successProb bf))
-        assert (result < 0.5 )
+        assert (result < 0.5)
     it "repeated probably calcs are withing 0.15 of each other" $ do
       let (attackingArmySize, defendingArmySize) = (23, 21)
       let bf = Battlefield attackingArmySize defendingArmySize
