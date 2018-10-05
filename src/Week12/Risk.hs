@@ -2,9 +2,10 @@
 
 module Week12.Risk where
 
+import Data.Ord (Down(Down))
 import Control.Monad.Random
 import Control.Arrow ((&&&))
-import Data.List (reverse, sort)
+import Data.List (reverse, sortOn)
 
 ------------------------------------------------------------
 -- Die values
@@ -39,20 +40,42 @@ data Battlefield = Battlefield
 ------------------------------------------------------------
 -- Exercise 2
 
+attacking :: Battlefield -> Army
+attacking battleField = min (max (attackers battleField - 1) 0) 3
+
+defending :: Battlefield -> Army
+defending battleField = min (defenders battleField) 2
+
 battle :: Battlefield -> Rand StdGen Battlefield
-battle = error "Week12.Risk#battle not implemented"
+battle battleField = do
+  results <-
+    zipWith (<=)
+      <$> (sortOn Down <$> replicateM (attacking battleField) die)
+      <*> (sortOn Down <$> replicateM (defending battleField) die)
+  pure $ Battlefield
+    (attackers battleField - length (filter id results))
+    (defenders battleField - length (filter not results))
 
 ------------------------------------------------------------
 -- Exercise 3
 
+iterateUntilM :: (Monad m) => (a -> Bool) -> (a -> m a) -> a -> m a
+iterateUntilM p f v
+  | p v = pure v
+  | otherwise = f v >>= iterateUntilM p f
+
 invade :: Battlefield -> Rand StdGen Battlefield
-invade = error "Week12.Risk#invade not implemented"
+invade = iterateUntilM done battle
+  where
+    done battleField = defenders battleField < 1 || attackers battleField < 2
 
 ------------------------------------------------------------
 -- Exercise 4
 
 successProb :: Battlefield -> Rand StdGen Double
-successProb = error "Week12.Risk#successProb not implemented"
+successProb =
+  ((/ 1000) . realToFrac . length . filter ((< 1) . defenders) <$>) .
+  replicateM 1000 . invade
 
 ------------------------------------------------------------
 -- Exercise 5
