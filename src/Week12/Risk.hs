@@ -3,8 +3,7 @@
 module Week12.Risk where
 
 import Control.Monad.Random
-import Control.Arrow ((&&&))
-import Data.List (reverse, sort)
+import Data.List (sortBy)
 
 ------------------------------------------------------------
 -- Die values
@@ -39,20 +38,47 @@ data Battlefield = Battlefield
 ------------------------------------------------------------
 -- Exercise 2
 
+roll :: Int -> Rand StdGen [DieValue]
+roll = fmap sortDesc . flip replicateM die
+  where
+    sortDesc = sortBy (flip compare)
+
+results :: Rand StdGen [DieValue] -> Rand StdGen [DieValue] -> Rand StdGen [Battlefield -> Battlefield]
+results as ds = zipWith decideKill <$> as <*> ds
+  where
+    decideKill a d
+      | a > d = \b -> b { defenders = defenders b - 1 }
+      | otherwise = \b -> b { attackers = attackers b - 1 }
+
 battle :: Battlefield -> Rand StdGen Battlefield
-battle = error "Week12.Risk#battle not implemented"
+battle b = foldr takeKills b <$> kills
+  where
+    takeKills f = f
+    kills = results rollAttack rollDefense
+    rollAttack = roll (min maxAttack (attackers b - 1))
+    rollDefense = roll (min maxDefense (defenders b))
+    maxAttack = 3
+    maxDefense = 2
 
 ------------------------------------------------------------
 -- Exercise 3
 
 invade :: Battlefield -> Rand StdGen Battlefield
-invade = error "Week12.Risk#invade not implemented"
+invade b
+  | (attackers b < 2) || (defenders b < 1) = pure b
+  | otherwise = invade =<< battle b
 
 ------------------------------------------------------------
 -- Exercise 4
 
+successProbN :: Int -> Battlefield -> Rand StdGen Double
+successProbN n = fmap (probN n) . invadeN n
+  where
+    invadeN = (. invade) . replicateM
+    probN n' = (/ realToFrac n') . realToFrac . length . filter ((< 1) . defenders)
+
 successProb :: Battlefield -> Rand StdGen Double
-successProb = error "Week12.Risk#successProb not implemented"
+successProb = successProbN 1000
 
 ------------------------------------------------------------
 -- Exercise 5

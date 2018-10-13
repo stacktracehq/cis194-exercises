@@ -11,7 +11,7 @@ import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
 import System.Random (StdGen, mkStdGen)
 import Test.Hspec (Spec, context, describe, hspec, it, shouldBe, shouldSatisfy)
-import Week12.Risk (Battlefield(..), battle, invade, successProb)
+import Week12.Risk (Battlefield(..), battle, invade, successProb, roll)
 
 spec :: Spec
 spec =
