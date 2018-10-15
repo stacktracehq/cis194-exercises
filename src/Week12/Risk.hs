@@ -43,18 +43,16 @@ roll = fmap sortDesc . flip replicateM die
   where
     sortDesc = sortBy (flip compare)
 
-results :: Rand StdGen [DieValue] -> Rand StdGen [DieValue] -> Rand StdGen [Battlefield -> Battlefield]
-results as ds = zipWith decideKill <$> as <*> ds
+kills :: Rand StdGen [DieValue] -> Rand StdGen [DieValue] -> Rand StdGen [Battlefield -> Battlefield]
+kills as ds = zipWith decideKill <$> as <*> ds
   where
     decideKill a d
       | a > d = \b -> b { defenders = defenders b - 1 }
       | otherwise = \b -> b { attackers = attackers b - 1 }
 
 battle :: Battlefield -> Rand StdGen Battlefield
-battle b = foldr takeKills b <$> kills
+battle b = foldr id b <$> kills rollAttack rollDefense
   where
-    takeKills f = f
-    kills = results rollAttack rollDefense
     rollAttack = roll (min maxAttack (attackers b - 1))
     rollDefense = roll (min maxDefense (defenders b))
     maxAttack = 3
