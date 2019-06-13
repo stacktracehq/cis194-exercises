@@ -5,23 +5,34 @@ module Week01.CreditCardValidator
   , sumDigits
   , validate
   ) where
-
+  
 toDigits :: Integer -> [Integer]
-toDigits =
-  error "Week01.CreditCardValidator#toDigits not implemented"
-
+toDigits n
+  | n <= 0 = []
+  | otherwise = toDigits (n `div` 10) ++ [n `mod` 10] 
+      
 toDigitsRev :: Integer -> [Integer]
-toDigitsRev =
-  error "Week01.CreditCardValidator#toDigitsRev not implemented"
+toDigitsRev n
+  | n <= 0 = []
+  | otherwise = n `mod` 10 : toDigitsRev (n `div` 10) 
+      
+-- toDigits :: Integer -> [Integer]
+-- toDigits n = reverse (toDigitsRev n)
+
+-- toDigitsRev :: Integer -> [Integer]
+-- toDigitsRev n
+--   | n <= 0 = []
+--   | otherwise = n `mod` 10 : toDigitsRev (n `div` 10) 
 
 doubleEveryOther :: [Integer] -> [Integer]
-doubleEveryOther =
-  error "Week01.CreditCardValidator#doubleEveryOther not implemented"
-
+doubleEveryOther = reverse . doubleEveryOther' . reverse
+  where 
+    doubleEveryOther' :: [Integer] -> [Integer]
+    doubleEveryOther' (x:(y:ys)) = x : 2*y : doubleEveryOther' ys
+    doubleEveryOther' x = x
+    
 sumDigits :: [Integer] -> Integer
-sumDigits =
-  error "Week01.CreditCardValidator#sumDigits not implemented"
+sumDigits = sum . (>>= toDigits)
 
 validate :: Integer -> Bool
-validate =
-  error "Week01.CreditCardValidator#validate not implemented"
+validate = (== 0) . (`mod` 10) . sumDigits . doubleEveryOther . toDigits
