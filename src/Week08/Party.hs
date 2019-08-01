@@ -4,38 +4,50 @@ module Week08.Party
   , nextLevel
   , maxFun
   , main
-  ) where
+  )
+where
 
-import Week08.Employee (GuestList(..), Employee(..))
-import Data.Tree (Tree)
+import           Week08.Employee                ( GuestList(..)
+                                                , Employee(..)
+                                                )
+import           Data.Tree                      ( Tree(..) )
+import           Control.Arrow                  ( (&&&) )
+import           Control.Monad                  ( join )
 
 --------------------------- Exercise 1
 
 glCons :: Employee -> GuestList -> GuestList
-glCons = error "Week08.Party#glCons not implemented"
+glCons e (GL { glGuests = currentGuests, glFun = currentFun }) =
+  GL { glGuests = e : currentGuests, glFun = currentFun + empFun e }
 
 -- See src/Week08/Employee.hs to implement
 -- the monoid instance for GuestList.
 -- Avoids orphans.
 
 moreFun :: GuestList -> GuestList -> GuestList
-moreFun = error "Week08.Party#moreFun not implemented"
+moreFun = max
 
 --------------------------- Exercise 2
 
 -- foldTree is defined in Data.Tree, go read it if you like
+treeFold :: (a -> [b] -> b) -> Tree a -> b
+treeFold f = go where go (Node a as) = f a (go <$> as)
 
 --------------------------- Exercise 3
 
 nextLevel :: Employee -> [(GuestList, GuestList)] -> (GuestList, GuestList)
-nextLevel = error "Week08.Party#nextLevel not implemented"
+nextLevel e = ((glCons e) . snd &&& fst) . mconcat
 
 --------------------------- Exercise 4
 
 maxFun :: Tree Employee -> GuestList
-maxFun = error "Week08.Party#maxFun not implemented"
+maxFun = uncurry moreFun . treeFold nextLevel
 
 --------------------------- Exercise 5
 
-main :: IO ()
-main = putStrLn "Do the thing"
+printGuestList :: GuestList -> String
+printGuestList g = "Test\n\n\n"
+
+main :: IO String
+main = join . (putStrLn . printGuestList . maxFun . read) <$> readFile
+  "./resources/Week08/company.txt"
