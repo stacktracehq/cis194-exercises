@@ -1,8 +1,15 @@
 module Week11.SExpr where
 
-import Control.Applicative
-import Data.Char (isSpace, isAlpha, isAlphaNum)
-import Week11.AParser (Parser, satisfy, char, posInt)
+import           Control.Applicative
+import           Data.Char                      ( isSpace
+                                                , isAlpha
+                                                , isAlphaNum
+                                                )
+import           Week11.AParser                 ( Parser
+                                                , satisfy
+                                                , char
+                                                , posInt
+                                                )
 
 ------------------------------------------------------------
 --  Exercise 1: Parsing repetitions

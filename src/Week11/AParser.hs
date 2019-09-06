@@ -6,10 +6,11 @@ module Week11.AParser
   , satisfy
   , char
   , posInt
-  ) where
+  )
+where
 
-import Control.Applicative
-import Data.Char
+import           Control.Applicative
+import           Data.Char
 
 newtype Parser a = Parser
   { runParser :: String -> Maybe (a, String)
@@ -17,26 +18,23 @@ newtype Parser a = Parser
 
 satisfy :: (Char -> Bool) -> Parser Char
 satisfy p = Parser f
-  where
-    f [] = Nothing
-    f (x:xs)
-      | p x = Just (x, xs)
-      | otherwise = Nothing
+ where
+  f [] = Nothing
+  f (x : xs) | p x       = Just (x, xs)
+             | otherwise = Nothing
 
 char :: Char -> Parser Char
 char c = satisfy (== c)
 
 posInt :: Parser Integer
 posInt = Parser f
-  where
-    f xs
-      | null ns = Nothing
-      | otherwise = Just (read ns, rest)
-      where
-        (ns, rest) = span isDigit xs
+ where
+  f xs | null ns   = Nothing
+       | otherwise = Just (read ns, rest)
+    where (ns, rest) = span isDigit xs
 
-inParser ::
-     ((String -> Maybe (a, String)) -> String -> Maybe (b, String))
+inParser
+  :: ((String -> Maybe (a, String)) -> String -> Maybe (b, String))
   -> Parser a
   -> Parser b
 inParser f = Parser . f . runParser
@@ -52,11 +50,9 @@ instance Applicative Parser where
   pure :: a -> Parser a
   pure a = Parser (\s -> Just (a, s))
   (<*>) :: Parser (a -> b) -> Parser a -> Parser b
-  (Parser fp) <*> xp =
-    Parser $ \s ->
-      case fp s of
-        Nothing -> Nothing
-        Just (f, s') -> runParser (f <$> xp) s'
+  (Parser fp) <*> xp = Parser $ \s -> case fp s of
+    Nothing      -> Nothing
+    Just (f, s') -> runParser (f <$> xp) s'
 
 instance Alternative Parser where
   empty :: Parser a

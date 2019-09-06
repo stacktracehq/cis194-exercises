@@ -2,7 +2,8 @@ module Week03.Golf
   ( skips
   , localMaxima
   , histogram
-  ) where
+  )
+where
 
 skips :: [a] -> [[a]]
 skips = error "Week03.Golf#skips not implemented"

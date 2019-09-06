@@ -2,7 +2,7 @@
 
 module Week08.Employee where
 
-import Data.Tree (Tree(..))
+import           Data.Tree                      ( Tree(..) )
 
 -- Employee names are represented by Strings.
 type Name = String
@@ -19,35 +19,32 @@ data Employee = Emp
 
 -- A small company hierarchy to use for testing purposes.
 testCompany :: Tree Employee
-testCompany =
-  Node
-    (Emp "Stan" 9)
-    [ Node
-        (Emp "Bob" 2)
-        [ Node (Emp "Joe" 5) [Node (Emp "John" 1) [], Node (Emp "Sue" 5) []]
-        , Node (Emp "Fred" 3) []
-        ]
-    , Node (Emp "Sarah" 17) [Node (Emp "Sam" 4) []]
+testCompany = Node
+  (Emp "Stan" 9)
+  [ Node
+    (Emp "Bob" 2)
+    [ Node (Emp "Joe" 5) [Node (Emp "John" 1) [], Node (Emp "Sue" 5) []]
+    , Node (Emp "Fred" 3) []
     ]
+  , Node (Emp "Sarah" 17) [Node (Emp "Sam" 4) []]
+  ]
 
 testCompany2 :: Tree Employee
-testCompany2 =
-  Node
-    (Emp "Stan" 9)
+testCompany2 = Node
+  (Emp "Stan" 9)
+  [ Node
+    (Emp "Bob" 3) -- (8, 8)
     [ Node
-        (Emp "Bob" 3) -- (8, 8)
-        [ Node
-            (Emp "Joe" 5) -- (5, 6)
-            [ Node (Emp "John" 1) [] -- (1, 0)
-            , Node (Emp "Sue" 5) [] -- (5, 0)
-            ]
-        , Node (Emp "Fred" 3) [] -- (3, 0)
-        ]
-    , Node
-        (Emp "Sarah" 17) -- (17, 4)
-        [ Node (Emp "Sam" 4) [] -- (4, 0)
-        ]
+      (Emp "Joe" 5) -- (5, 6)
+      [ Node (Emp "John" 1) [] -- (1, 0)
+      , Node (Emp "Sue" 5)  [] -- (5, 0)
+      ]
+    , Node (Emp "Fred" 3) [] -- (3, 0)
     ]
+  , Node (Emp "Sarah" 17) -- (17, 4)
+         [Node (Emp "Sam" 4) [] -- (4, 0)
+                               ]
+  ]
 
 -- A type to store a list of guests and their total fun score.
 data GuestList =

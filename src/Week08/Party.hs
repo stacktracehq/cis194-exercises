@@ -4,10 +4,13 @@ module Week08.Party
   , nextLevel
   , maxFun
   , main
-  ) where
+  )
+where
 
-import Week08.Employee (GuestList(..), Employee(..))
-import Data.Tree (Tree)
+import           Week08.Employee                ( GuestList(..)
+                                                , Employee(..)
+                                                )
+import           Data.Tree                      ( Tree )
 
 --------------------------- Exercise 1
 

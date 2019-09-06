@@ -12,24 +12,23 @@ module Week04.Soln
   , myFoldl
   , cartProd
   , sieveSundaram
-  ) where
+  )
+where
 
 ---------------------------  Exercise 1
 
 fun1 :: [Integer] -> Integer
-fun1 []     = 1
-fun1 (x:xs)
-  | even x    = (x - 2) * fun1 xs
-  | otherwise = fun1 xs
+fun1 [] = 1
+fun1 (x : xs) | even x    = (x - 2) * fun1 xs
+              | otherwise = fun1 xs
 
 fun1' :: [Integer] -> Integer
 fun1' = error "Week04.Soln#fun2' not implemented"
 
 fun2 :: Integer -> Integer
 fun2 1 = 0
-fun2 n
-  | even n    = n + fun2 (n `div` 2)
-  | otherwise = fun2 (3 * n + 1)
+fun2 n | even n    = n + fun2 (n `div` 2)
+       | otherwise = fun2 (3 * n + 1)
 
 fun2' :: Integer -> Integer
 fun2' = error "Week04.Soln#fun2' not implemented"
@@ -42,12 +41,18 @@ foldTree :: [a] -> Tree a
 foldTree = error "Week04.Soln#foldTree not implemented"
 
 showTree :: Show a => Tree a -> String
-showTree Leaf = ""
+showTree Leaf             = ""
 showTree n@(Node s _ _ _) = go s n
-  where
+ where
   go _ (Leaf) = ""
-  go i (Node h l c r) = go (i-1) l ++
-    replicate (4*fromIntegral i) ' ' ++ show c ++ "-" ++ show h ++ "\n" ++ go (i-1) r
+  go i (Node h l c r) =
+    go (i - 1) l
+      ++ replicate (4 * fromIntegral i) ' '
+      ++ show c
+      ++ "-"
+      ++ show h
+      ++ "\n"
+      ++ go (i - 1) r
 
 -- will print a tree in ghci, root node will be the rightmost in the printed structure
 -- nodes will be printed as [value]-[height]
@@ -72,7 +77,7 @@ myFoldl = error "Week04.Soln#myFoldl not implemented"
 -- cartProd provided for you to use in your solution
 
 cartProd :: [a] -> [b] -> [(a, b)]
-cartProd xs ys = [(x,y) | x <- xs, y <- ys]
+cartProd xs ys = [ (x, y) | x <- xs, y <- ys ]
 
 sieveSundaram :: Integer -> [Integer]
 sieveSundaram = error "Week04.Soln#sieveSundaram not implemented"
