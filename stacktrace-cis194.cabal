@@ -40,7 +40,8 @@ library
     base >=4.10 && <5,
     containers,
     mtl,
-    MonadRandom
+    MonadRandom,
+    lens
   hs-source-dirs:
     src
   default-language:
