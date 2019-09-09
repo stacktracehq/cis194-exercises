@@ -40,8 +40,8 @@ spec = describe "Week 10" $ do
   intPairSpec
   intOrUppercaseSpec
 
-unicodeString :: MonadGen m => m String
-unicodeString = Gen.string (Range.linear 0 100) Gen.unicode
+unicodeString :: (MonadGen m) => m String
+unicodeString = Gen.string (Range.linear 0 100) Gen.unicodeAll
 
 functorSpec :: Spec
 functorSpec = describe "Functor" $ do
