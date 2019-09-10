@@ -4,24 +4,21 @@ module Week01.CreditCardValidator
   , doubleEveryOther
   , sumDigits
   , validate
-  ) where
+  )
+where
 
 toDigits :: Integer -> [Integer]
-toDigits =
-  error "Week01.CreditCardValidator#toDigits not implemented"
+toDigits = error "Week01.CreditCardValidator#toDigits not implemented"
 
 toDigitsRev :: Integer -> [Integer]
-toDigitsRev =
-  error "Week01.CreditCardValidator#toDigitsRev not implemented"
+toDigitsRev = error "Week01.CreditCardValidator#toDigitsRev not implemented"
 
 doubleEveryOther :: [Integer] -> [Integer]
 doubleEveryOther =
   error "Week01.CreditCardValidator#doubleEveryOther not implemented"
 
 sumDigits :: [Integer] -> Integer
-sumDigits =
-  error "Week01.CreditCardValidator#sumDigits not implemented"
+sumDigits = error "Week01.CreditCardValidator#sumDigits not implemented"
 
 validate :: Integer -> Bool
-validate =
-  error "Week01.CreditCardValidator#validate not implemented"
+validate = error "Week01.CreditCardValidator#validate not implemented"

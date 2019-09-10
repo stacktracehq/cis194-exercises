@@ -6,7 +6,8 @@ module Week02.Log
   , MessageTree(..)
   , testParse
   , testWhatWentWrong
-  ) where
+  )
+where
 
 data MessageType
   = Info
@@ -38,8 +39,8 @@ testParse parse n file = take n . parse <$> readFile file
 -- | @testWhatWentWrong p w f@ tests the log file parser @p@ and
 --   warning message extractor @w@ by running them on the log file
 --   @f@.
-testWhatWentWrong ::
-     (String -> [LogMessage])
+testWhatWentWrong
+  :: (String -> [LogMessage])
   -> ([LogMessage] -> [String])
   -> FilePath
   -> IO [String]

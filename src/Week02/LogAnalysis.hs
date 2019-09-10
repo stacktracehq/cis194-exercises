@@ -6,16 +6,16 @@ module Week02.LogAnalysis
   , inOrder
   , whatWentWrong
   , module Week02.Log
-  ) where
-
-import Week02.Log
-  ( LogMessage(..)
-  , MessageTree(..)
-  , MessageType(..)
-  , TimeStamp
-  , testWhatWentWrong
-  , testParse
   )
+where
+
+import           Week02.Log                     ( LogMessage(..)
+                                                , MessageTree(..)
+                                                , MessageType(..)
+                                                , TimeStamp
+                                                , testWhatWentWrong
+                                                , testParse
+                                                )
 
 parseMessage :: String -> LogMessage
 parseMessage = error "Week02.LogAnalysis#parseMessage not implemented"

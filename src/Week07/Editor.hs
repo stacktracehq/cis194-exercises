@@ -2,13 +2,15 @@
 
 module Week07.Editor where
 
-import Control.Arrow (first, second)
-import Control.Exception
-import Control.Monad.State
-import Data.Char
-import Data.List
-import System.IO
-import Week07.Buffer
+import           Control.Arrow                  ( first
+                                                , second
+                                                )
+import           Control.Exception
+import           Control.Monad.State
+import           Data.Char
+import           Data.List
+import           System.IO
+import           Week07.Buffer
 
 -- Editor commands
 data Command
@@ -54,19 +56,18 @@ io = liftIO
 
 -- Utility functions
 readMay :: Read a => String -> Maybe a
-readMay s =
-  case reads s of
-    [(r, _)] -> Just r
-    _ -> Nothing
+readMay s = case reads s of
+  [(r, _)] -> Just r
+  _        -> Nothing
 
 -- Main editor loop
 editor :: Buffer b => Editor b ()
 editor = io (hSetBuffering stdout NoBuffering) >> loop
-  where
-    loop = do
-      prompt
-      cmd <- getCommand
-      when (cmd /= Quit) (doCommand cmd >> loop)
+ where
+  loop = do
+    prompt
+    cmd <- getCommand
+    when (cmd /= Quit) (doCommand cmd >> loop)
 
 prompt :: Buffer b => Editor b ()
 prompt = do
@@ -75,13 +76,13 @@ prompt = do
 
 getCommand :: Editor b Command
 getCommand = io $ readCom <$> getLine
-  where
-    readCom "" = Noop
-    readCom inp@(c:cs)
-      | isDigit c = maybe Noop Line (readMay inp)
-      | toUpper c == 'L' = Load (unwords $ words cs)
-      | c == '?' = Help
-      | otherwise = maybe Noop read $ find ((== toUpper c) . head) commands
+ where
+  readCom "" = Noop
+  readCom inp@(c : cs)
+    | isDigit c        = maybe Noop Line (readMay inp)
+    | toUpper c == 'L' = Load (unwords $ words cs)
+    | c == '?'         = Help
+    | otherwise        = maybe Noop read $ find ((== toUpper c) . head) commands
 
 doCommand :: Buffer b => Command -> Editor b ()
 doCommand View = do
@@ -89,13 +90,12 @@ doCommand View = do
   let ls = [(cur - 2) .. (cur + 2)]
   ss <- mapM (onBuffer . line) ls
   zipWithM_ (showL cur) ls ss
-  where
-    showL _ _ Nothing = return ()
-    showL l n (Just s) = io $ putStrLn (m ++ show n ++ ": " ++ s)
-      where
-        m
-          | n == l = "*"
-          | otherwise = " "
+ where
+  showL _ _ Nothing  = return ()
+  showL l n (Just s) = io $ putStrLn (m ++ show n ++ ": " ++ s)
+   where
+    m | n == l    = "*"
+      | otherwise = " "
 doCommand Edit = do
   l <- getCurLine
   io $ putStr $ "Replace line " ++ show l ++ ": "
@@ -103,26 +103,30 @@ doCommand Edit = do
   modBuffer $ replaceLine l new
 doCommand (Load filename) = do
   mstr <-
-    io $
-    handle (\(_ :: IOException) -> putStrLn "File not found." >> return Nothing) $ do
-      h <- openFile filename ReadMode
-      hSetEncoding h utf8
-      Just <$> hGetContents h
+    io
+    $ handle
+        (\(_ :: IOException) -> putStrLn "File not found." >> return Nothing)
+    $ do
+        h <- openFile filename ReadMode
+        hSetEncoding h utf8
+        Just <$> hGetContents h
   maybe (return ()) (modBuffer . const . fromString) mstr
 doCommand (Line n) = modCurLine (const n) >> doCommand View
-doCommand Next = modCurLine (+ 1) >> doCommand View
-doCommand Prev = modCurLine (subtract 1) >> doCommand View
-doCommand Quit = return () -- do nothing, main loop notices this and quits
+doCommand Next     = modCurLine (+ 1) >> doCommand View
+doCommand Prev     = modCurLine (subtract 1) >> doCommand View
+doCommand Quit     = return () -- do nothing, main loop notices this and quits
 doCommand Help =
-  io . putStr . unlines $
-  [ "v --- view the current location in the document"
-  , "n --- move to the next line"
-  , "p --- move to the previous line"
-  , "l --- load a file into the editor"
-  , "e --- edit the current line"
-  , "q --- quit"
-  , "? --- show this list of commands"
-  ]
+  io
+    . putStr
+    . unlines
+    $ [ "v --- view the current location in the document"
+      , "n --- move to the next line"
+      , "p --- move to the previous line"
+      , "l --- load a file into the editor"
+      , "e --- edit the current line"
+      , "q --- quit"
+      , "? --- show this list of commands"
+      ]
 doCommand Noop = return ()
 
 inBuffer :: Buffer b => Int -> Editor b Bool
@@ -132,6 +136,6 @@ inBuffer n = do
 
 modCurLine :: Buffer b => (Int -> Int) -> Editor b ()
 modCurLine f = do
-  l <- getCurLine
+  l  <- getCurLine
   nl <- onBuffer numLines
   setCurLine . max 0 . min (nl - 1) $ f l

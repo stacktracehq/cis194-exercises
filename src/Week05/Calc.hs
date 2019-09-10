@@ -10,12 +10,13 @@ module Week05.Calc
   , compile
   , HasVars(..)
   , VarExprT(..)
-  ) where
+  )
+where
 
-import Week05.ExprT
-import Week05.Parser
-import qualified Week05.StackVM as SVM
-import qualified Data.Map as M
+import           Week05.ExprT
+import           Week05.Parser
+import qualified Week05.StackVM                as SVM
+import qualified Data.Map                      as M
 
 --------------------------------------------------- Exercise 1
 
@@ -97,9 +98,17 @@ instance HasVars VarExprT where
   var = error "Week05.Calc#var not implemented for VarExprT"
 
 instance HasVars (M.Map String Integer -> Maybe Integer) where
-  var = error "Week05.Calc#var not implemented for (M.Map String Integer -> Maybe Integer)"
+  var =
+    error
+      "Week05.Calc#var not implemented for (M.Map String Integer -> Maybe Integer)"
 
 instance Expr (M.Map String Integer -> Maybe Integer) where
-  lit = error "Week05.Calc#lit not implemented for (M.Map String Integer -> Maybe Integer)"
-  add = error "Week05.Calc#add not implemented for (M.Map String Integer -> Maybe Integer)"
-  mul = error "Week05.Calc#mul not implemented for (M.Map String Integer -> Maybe Integer)"
+  lit =
+    error
+      "Week05.Calc#lit not implemented for (M.Map String Integer -> Maybe Integer)"
+  add =
+    error
+      "Week05.Calc#add not implemented for (M.Map String Integer -> Maybe Integer)"
+  mul =
+    error
+      "Week05.Calc#mul not implemented for (M.Map String Integer -> Maybe Integer)"

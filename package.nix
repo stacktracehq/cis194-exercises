@@ -1,5 +1,5 @@
 { mkDerivation, base, containers, hedgehog, hspec
-, hw-hspec-hedgehog, MonadRandom, mtl, stdenv
+, hw-hspec-hedgehog, MonadRandom, mtl, stdenv, lens
 }:
 mkDerivation {
   pname = "stacktrace-cis194";
@@ -7,7 +7,7 @@ mkDerivation {
   src = ./.;
   libraryHaskellDepends = [ base containers MonadRandom mtl ];
   testHaskellDepends = [
-    base containers hedgehog hspec hw-hspec-hedgehog
+    base containers hedgehog hspec hw-hspec-hedgehog lens
   ];
   homepage = "https://github.com/stacktracehq/cosmos/tree/master/training/CIS194";
   description = "Resources for working through CIS194 together";

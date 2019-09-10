@@ -2,9 +2,11 @@
 
 module Week12.Risk where
 
-import Control.Monad.Random
-import Control.Arrow ((&&&))
-import Data.List (reverse, sort)
+import           Control.Monad.Random
+import           Control.Arrow                  ( (&&&) )
+import           Data.List                      ( reverse
+                                                , sort
+                                                )
 
 ------------------------------------------------------------
 -- Die values
