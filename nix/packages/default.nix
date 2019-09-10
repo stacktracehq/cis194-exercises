@@ -10,6 +10,7 @@ let
     haskellPackages = super.haskellPackages.override {
       overrides = hself: hsuper:  {};
     };
+    tmux-up = self.callPackage ./tmux-up {};
   };
 in
   import ./nixpkgs {
