@@ -120,6 +120,8 @@ $ dev/watch test/Week01/CreditCardValidatorSpec.hs
 
 There is a script `dev/up` that will tmux up your editor, tests (using `dev/watch`) and a repl for a given week.
 
+_Note_: Both `tmux` and `tmux-up` are provided by `nix` so it is best to run it from a `nix-shell` *detatched from any tmux session(s)*.
+
 Args are
 
 1. "windows" | "panes"
@@ -129,10 +131,12 @@ Args are
 For example:
 
 ```sh
+$ nix-shell
 $ dev/up windows Week02 vim
 ```
 
 Another example
 ```
+$ nix-shell
 $ dev/up panes All code
 ```
