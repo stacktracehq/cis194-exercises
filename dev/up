@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+ROOT=$(git rev-parse --show-toplevel)
+WINDOWS_OR_PANES=${1:-"windows"}
+WEEK=${2:-"Week01"}
+EDITOR=${3:-"vim"}
+CONF_FILE="$ROOT/$WEEK.conf"
+case $WEEK in
+  "Week01")
+    HS_TEST_FILE=$ROOT/test/$WEEK/CreditCardValidatorSpec.hs
+    HS_SRC_FILE=$ROOT/src/$WEEK/CreditCardValidator.hs
+    ;;
+  "Week02")
+    HS_TEST_FILE=$ROOT/test/$WEEK/LogAnalysisSpec.hs
+    HS_SRC_FILE=$ROOT/src/$WEEK/LogAnalysis.hs
+    ;;
+  "Week03")
+    HS_TEST_FILE=$ROOT/test/$WEEK/GolfSpec.hs
+    HS_SRC_FILE=$ROOT/src/$WEEK/Golf.hs
+    ;;
+  "Week04")
+    HS_TEST_FILE=$ROOT/test/$WEEK/SolnSpec.hs
+    HS_SRC_FILE=$ROOT/src/$WEEK/Soln.hs
+    ;;
+  "Week05")
+    HS_TEST_FILE=$ROOT/test/$WEEK/CalcSpec.hs
+    HS_SRC_FILE=$ROOT/src/$WEEK/Calc.hs
+    ;;
+  "Week06")
+    HS_TEST_FILE=$ROOT/test/$WEEK/FibonacciSpec.hs
+    HS_SRC_FILE=$ROOT/src/$WEEK/Fibonacci.hs
+    ;;
+  "Week07")
+    HS_TEST_FILE=$ROOT/test/$WEEK/JoinListSpec.hs
+    HS_SRC_FILE=$ROOT/src/$WEEK/JoinList.hs
+    ;;
+  "Week08")
+    HS_TEST_FILE=$ROOT/test/$WEEK/PartySpec.hs
+    HS_SRC_FILE=$ROOT/src/$WEEK/Party.hs
+    ;;
+  "Week10")
+    HS_TEST_FILE=$ROOT/test/$WEEK/AParserSpec.hs
+    HS_SRC_FILE=$ROOT/src/$WEEK/AParser.hs
+    ;;
+  "Week11")
+    HS_TEST_FILE=$ROOT/test/$WEEK/SExprSpec.hs
+    HS_SRC_FILE=$ROOT/src/$WEEK/SExpr.hs
+    ;;
+  "Week12")
+    HS_TEST_FILE=$ROOT/test/$WEEK/RiskSpec.hs
+    HS_SRC_FILE=$ROOT/src/$WEEK/Risk.hs
+    ;;
+  "All")
+    HS_TEST_FILE=$ROOT/test/Spec.hs
+    ;;
+esac
+GHCID_COMMAND="$ROOT/dev/watch $HS_TEST_FILE"
+
+trap "rm $CONF_FILE" EXIT
+
+if [ $WINDOWS_OR_PANES == "windows" ] ;
+then
+  cat <<- WINDOW > $CONF_FILE
+    rename-window vim
+    new-window -n tests
+    new-window -n repl
+
+    send-keys -t $EDITOR "cd $ROOT" C-m
+    send-keys -t $EDITOR "nix-shell" C-m
+    send-keys -t $EDITOR "$EDITOR ." C-m
+
+    send-keys -t tests "cd $ROOT" C-m
+    send-keys -t tests "nix-shell" C-m
+    send-keys -t tests "$GHCID_COMMAND" C-m
+
+    send-keys -t repl "cd $ROOT" C-m
+    send-keys -t repl "nix-shell" C-m
+    send-keys -t repl "ghci $HS_SRC_FILE" C-m
+WINDOW
+else
+  cat <<- PANES >$CONF_FILE
+    rename-window cis
+
+    split-window -v -p 95
+    split-window -v -p 95
+
+    send-keys -t cis.0 "cd $ROOT" C-m
+    send-keys -t cis.0 "nix-shell" C-m
+    send-keys -t cis.0 "vim ." C-m
+
+    send-keys -t cis.1 "cd $ROOT" C-m
+    send-keys -t cis.1 "nix-shell" C-m
+    send-keys -t cis.1 "$GHCID_COMMAND" C-m
+
+    send-keys -t cis.2 "cd $ROOT" C-m
+    send-keys -t cis.2 "nix-shell" C-m
+    send-keys -t cis.2 "ghci $HS_SRC_FILE" C-m
+
+    select-layout even-vertical
+PANES
+fi
+
+tmux-up $CONF_FILE

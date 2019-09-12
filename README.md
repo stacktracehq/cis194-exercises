@@ -115,3 +115,24 @@ To run only the tests for a given spec file using the watch script (defaults to 
 ```
 $ dev/watch test/Week01/CreditCardValidatorSpec.hs
 ```
+
+### Tmux
+
+There is a script `dev/up` that will tmux up your editor, tests (using `dev/watch`) and a repl for a given week.
+
+Args are
+
+1. "windows" | "panes"
+2. "WeekXX" | "All"
+3. An editor to run
+
+For example:
+
+```sh
+$ dev/up windows Week02 vim
+```
+
+Another example
+```
+$ dev/up panes All code
+```
