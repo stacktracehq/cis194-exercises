@@ -1,9 +1,10 @@
 packages:
   [
     packages.direnv
-    packages.tmux-up
-    packages.haskellPackages.cabal-install
     packages.ghcid
-    packages.haskellPackages.hlint
     packages.haskellPackages.brittany
+    packages.haskellPackages.cabal-install
+    packages.haskellPackages.hlint
+    packages.tmux
+    packages.tmux-up
   ]
