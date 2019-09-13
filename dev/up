@@ -63,7 +63,7 @@ trap "rm $CONF_FILE" EXIT
 if [ $WINDOWS_OR_PANES == "windows" ] ;
 then
   cat <<- WINDOW > $CONF_FILE
-    rename-window vim
+    rename-window $EDITOR
     new-window -n tests
     new-window -n repl
 
@@ -88,7 +88,7 @@ else
 
     send-keys -t cis.0 "cd $ROOT" C-m
     send-keys -t cis.0 "nix-shell" C-m
-    send-keys -t cis.0 "vim ." C-m
+    send-keys -t cis.0 "$EDITOR ." C-m
 
     send-keys -t cis.1 "cd $ROOT" C-m
     send-keys -t cis.1 "nix-shell" C-m
