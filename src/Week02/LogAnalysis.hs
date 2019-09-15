@@ -10,27 +10,80 @@ module Week02.LogAnalysis
 where
 
 import           Week02.Log                     ( LogMessage(..)
-                                                , MessageTree(..)
+                                                , Tree(..)
+                                                , MessageTree
                                                 , MessageType(..)
                                                 , TimeStamp
                                                 , testWhatWentWrong
                                                 , testParse
                                                 )
+import           Data.Void                      ( Void )
+import           Text.Megaparsec                ( Parsec
+                                                , runParser
+                                                , takeRest
+                                                )
+import           Text.Megaparsec.Char           ( space1
+                                                , char
+                                                )
+
+import qualified Text.Megaparsec.Char.Lexer    as L
+import           Control.Applicative            ( (<|>) )
+import           Data.Foldable                  ( foldl'
+                                                , toList
+                                                )
+
+type Parser = Parsec Void String
+
+messageParser :: Parser LogMessage
+messageParser =
+  let lexeme :: Parser a -> Parser a
+      lexeme = L.lexeme (L.space space1 space1 space1)
+      level :: Parser MessageType
+      level =
+          lexeme
+            $   (Info <$ char 'I')
+            <|> (Warning <$ char 'W')
+            <|> (Error <$> (char 'E' *> space1 *> L.decimal))
+
+      date :: Parser Int
+      date = lexeme L.decimal
+      msg :: Parser String
+      msg = takeRest
+  in  LogMessage <$> level <*> date <*> msg
 
 parseMessage :: String -> LogMessage
-parseMessage = error "Week02.LogAnalysis#parseMessage not implemented"
+parseMessage msg =
+  let resultToLogMessage = either (const (Unknown msg)) id
+  in  resultToLogMessage $ runParser messageParser "" msg
 
 parse :: String -> [LogMessage]
-parse = error "Week02.LogAnalysis#parse not implemented"
+parse = (parseMessage <$>) . lines
 
 insert :: LogMessage -> MessageTree -> MessageTree
-insert = error "Week02.LogAnalysis#insert not implemented"
+insert lm Leaf = Node Leaf lm Leaf
+insert lm tree@(Node l lm' r) =
+  let getTimeForMessage :: LogMessage -> Maybe TimeStamp
+      getTimeForMessage (LogMessage _ t _) = Just t
+      getTimeForMessage _                  = Nothing
+  in  case (<) <$> getTimeForMessage lm <*> getTimeForMessage lm' of
+        Nothing    -> tree
+        Just True  -> Node (insert lm l) lm' r
+        Just False -> Node l lm' (insert lm r)
 
 build :: [LogMessage] -> MessageTree
-build = error "Week02.LogAnalysis#build not implemented"
+build = foldl' (flip insert) Leaf
 
 inOrder :: MessageTree -> [LogMessage]
-inOrder = error "Week02.LogAnalysis#inOrder not implemented"
+inOrder = toList
 
 whatWentWrong :: [LogMessage] -> [String]
-whatWentWrong = error "Week02.LogAnalysis#whatWentWrong not implemented"
+whatWentWrong =
+  let matchesSeverity :: (Int -> Bool) -> LogMessage -> Bool
+      matchesSeverity f (LogMessage (Error s) _ _) = f s
+      matchesSeverity _ _                          = False
+
+      isSevere = matchesSeverity (>= 50)
+
+      getMessage (LogMessage _ _ m) = m
+      getMessage _                  = ""
+  in  map getMessage . filter isSevere . inOrder . build

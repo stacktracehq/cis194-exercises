@@ -11,7 +11,8 @@ import           Test.Hspec                     ( Spec
                                                 , shouldBe
                                                 )
 import           Week02.LogAnalysis             ( LogMessage(..)
-                                                , MessageTree(..)
+                                                , Tree(..)
+                                                , MessageTree
                                                 , MessageType(..)
                                                 , build
                                                 , inOrder

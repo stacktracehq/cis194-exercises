@@ -1,9 +1,12 @@
 -- CIS 194 Homework 2
+{-# LANGUAGE DeriveFoldable #-}
+
 module Week02.Log
   ( MessageType(..)
   , TimeStamp
   , LogMessage(..)
-  , MessageTree(..)
+  , MessageTree
+  , Tree(..)
   , testParse
   , testWhatWentWrong
   )
@@ -24,12 +27,14 @@ data LogMessage
   | Unknown String
   deriving (Show, Eq)
 
-data MessageTree
+data Tree a
   = Leaf
-  | Node MessageTree
-         LogMessage
-         MessageTree
-  deriving (Show, Eq)
+  | Node (Tree a)
+         a
+         (Tree a)
+  deriving (Show, Eq, Foldable)
+
+type MessageTree = Tree LogMessage
 
 -- | @testParse p n f@ tests the log file parser @p@ by running it
 --   on the first @n@ lines of file @f@.
