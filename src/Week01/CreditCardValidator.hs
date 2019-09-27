@@ -8,17 +8,22 @@ module Week01.CreditCardValidator
 where
 
 toDigits :: Integer -> [Integer]
-toDigits = error "Week01.CreditCardValidator#toDigits not implemented"
+toDigits = reverse . toDigitsRev
 
 toDigitsRev :: Integer -> [Integer]
-toDigitsRev = error "Week01.CreditCardValidator#toDigitsRev not implemented"
+toDigitsRev x | x <= 0    = []
+              | otherwise = x `mod` 10 : toDigitsRev (x `div` 10)
 
 doubleEveryOther :: [Integer] -> [Integer]
-doubleEveryOther =
-  error "Week01.CreditCardValidator#doubleEveryOther not implemented"
+doubleEveryOther = reverse . fromleft . reverse
+ where
+  fromleft :: [Integer] -> [Integer]
+  fromleft (x : s : xs) = x : (2 * s) : (fromleft xs)
+  fromleft xss          = xss
+
 
 sumDigits :: [Integer] -> Integer
-sumDigits = error "Week01.CreditCardValidator#sumDigits not implemented"
+sumDigits x = sum $ concat $ map (\n -> toDigits n) x
 
 validate :: Integer -> Bool
-validate = error "Week01.CreditCardValidator#validate not implemented"
+validate x = (sumDigits $ doubleEveryOther $ toDigits x) `mod` 10 == 0
