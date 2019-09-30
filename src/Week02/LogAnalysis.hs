@@ -17,20 +17,46 @@ import           Week02.Log                     ( LogMessage(..)
                                                 , testParse
                                                 )
 
+isInt :: String -> Bool
+isInt s = not . null $ (reads s :: [(Int, String)])
+
+pickType :: [String] -> LogMessage
+pickType ("I" : time : message) | isInt time =
+  LogMessage Info (read time) (unwords message)
+pickType ("W" : time : message) | isInt time =
+  LogMessage Warning (read time) (unwords message)
+pickType ("E" : level : time : message) | isInt level && isInt time =
+  LogMessage (Error (read level)) (read time) (unwords message)
+pickType xs = Unknown . unwords $ xs
+
 parseMessage :: String -> LogMessage
-parseMessage = error "Week02.LogAnalysis#parseMessage not implemented"
+parseMessage = pickType . words
 
 parse :: String -> [LogMessage]
-parse = error "Week02.LogAnalysis#parse not implemented"
+parse = map parseMessage . lines
 
 insert :: LogMessage -> MessageTree -> MessageTree
-insert = error "Week02.LogAnalysis#insert not implemented"
+insert (Unknown _) mt   = mt
+insert lm          Leaf = Node Leaf lm Leaf
+insert newLog@(LogMessage _ newTime _) (Node lt currentLog@(LogMessage _ currentTime _) rt)
+  | newTime >= currentTime
+  = Node lt currentLog (insert newLog rt)
+  | otherwise
+  = Node (insert newLog lt) currentLog rt
+insert _ _ = error "Week02.LogAnalysis#insert encountered an unexpected state"
 
 build :: [LogMessage] -> MessageTree
-build = error "Week02.LogAnalysis#build not implemented"
+build = foldr insert Leaf . reverse
+-- build = foldl (flip $ insert) Leaf
 
 inOrder :: MessageTree -> [LogMessage]
-inOrder = error "Week02.LogAnalysis#inOrder not implemented"
+inOrder Leaf             = []
+inOrder (Node lT msg rT) = (inOrder lT) ++ [msg] ++ (inOrder rT)
+
+isRelevant :: LogMessage -> Bool
+isRelevant (LogMessage (Error s) _ _) = s > 50
+isRelevant _                          = False
 
 whatWentWrong :: [LogMessage] -> [String]
-whatWentWrong = error "Week02.LogAnalysis#whatWentWrong not implemented"
+whatWentWrong =
+  map (\(LogMessage _ _ m) -> m) . filter isRelevant . inOrder . build
