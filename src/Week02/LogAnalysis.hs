@@ -18,16 +18,27 @@ import           Week02.Log                     ( LogMessage(..)
                                                 )
 
 parseMessage :: String -> LogMessage
-parseMessage = error "Week02.LogAnalysis#parseMessage not implemented"
+parseMessage = parseWords . words
+
+parseWords :: [String] -> LogMessage
+parseWords ("I":t:rest) = LogMessage Info (read t) (unwords rest)
+parseWords ("W":t:rest) = LogMessage Warning (read t) (unwords rest)
+parseWords ("E":n:t:rest) = LogMessage (Error (read n)) (read t) (unwords rest)
+parseWords x = Unknown . unwords $ x
 
 parse :: String -> [LogMessage]
-parse = error "Week02.LogAnalysis#parse not implemented"
+parse = map parseMessage . lines
 
 insert :: LogMessage -> MessageTree -> MessageTree
-insert = error "Week02.LogAnalysis#insert not implemented"
+insert (Unknown _) mt = mt
+insert n Leaf = Node Leaf n Leaf
+insert n@(LogMessage _ nt _) (Node l m@(LogMessage _ mt _) r)
+  | nt < mt = Node (insert n l) m r
+  | otherwise = Node l m (insert n r)
+insert _ mt = mt
 
 build :: [LogMessage] -> MessageTree
-build = error "Week02.LogAnalysis#build not implemented"
+build = foldr insert Leaf . reverse
 
 inOrder :: MessageTree -> [LogMessage]
 inOrder = error "Week02.LogAnalysis#inOrder not implemented"
