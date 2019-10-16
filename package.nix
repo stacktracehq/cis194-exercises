@@ -1,11 +1,12 @@
 { mkDerivation, base, containers, hedgehog, hspec
 , hw-hspec-hedgehog, MonadRandom, mtl, stdenv, lens, megaparsec
+, utility-ht
 }:
 mkDerivation {
   pname = "stacktrace-cis194";
   version = "0.1.0.0";
   src = ./.;
-  libraryHaskellDepends = [ base containers MonadRandom mtl lens megaparsec ];
+  libraryHaskellDepends = [ base containers MonadRandom mtl lens megaparsec utility-ht ];
   testHaskellDepends = [
     base containers hedgehog hspec hw-hspec-hedgehog
   ];
