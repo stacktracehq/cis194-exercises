@@ -1,5 +1,6 @@
 {-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE InstanceSigs #-}
 
 module Week05.Calc
   ( eval
@@ -21,12 +22,14 @@ import qualified Data.Map                      as M
 --------------------------------------------------- Exercise 1
 
 eval :: ExprT -> Integer
-eval = error "Week05.Calc#eval not implemented"
+eval (Lit n    ) = n
+eval (Add e1 e2) = (eval e1) + (eval e2)
+eval (Mul e1 e2) = (eval e1) * (eval e2)
 
 --------------------------------------------------- Exercise 2
 
 evalStr :: String -> Maybe Integer
-evalStr = error "Week05.Calc#evalStr not implemented"
+evalStr = (eval <$>) . parseExp Lit Add Mul
 
 --------------------------------------------------- Exercise 3
 
@@ -38,9 +41,12 @@ class Expr a where
 
 -- now write an instance for our ExprT type
 instance Expr ExprT where
-  lit = error "Week05.Calc#lit not implemented for ExprT"
-  add = error "Week05.Calc#add not implemented for ExprT"
-  mul = error "Week05.Calc#mul not implemented for ExprT"
+  lit = Lit
+  add = Add
+  mul = Mul
+
+-- reify :: ExprT -> ExprT
+-- reify = id
 
 --------------------------------------------------- Exercise 4
 -- Write instances for Integer, Bool, MinMax, and Mod7
@@ -49,34 +55,44 @@ newtype MinMax = MinMax Integer deriving (Eq, Show)
 newtype Mod7 = Mod7 Integer deriving (Eq, Show)
 
 instance Expr Integer where
-  lit = error "Week05.Calc#lit not implemented for Integer"
-  add = error "Week05.Calc#lit not implemented for Integer"
-  mul = error "Week05.Calc#lit not implemented for Integer"
+  lit :: Integer -> Integer
+  lit = id
+  add :: Integer -> Integer -> Integer
+  add = (+)
+  mul :: Integer -> Integer -> Integer
+  mul = (*)
 
 instance Expr Bool where
-  lit = error "Week05.Calc#lit not implemented for Bool"
-  add = error "Week05.Calc#add not implemented for Bool"
-  mul = error "Week05.Calc#mul not implemented for Bool"
+  lit n = if n < 1 then False else True
+  add = (||)
+  mul = (&&)
+
+instance Ord MinMax where
+  (<=) :: MinMax -> MinMax -> Bool
+  (MinMax n) <= (MinMax m) = n <= m
 
 instance Expr MinMax where
-  lit = error "Week05.Calc#lit not implemented for MinMax"
-  add = error "Week05.Calc#add not implemented for MinMax"
-  mul = error "Week05.Calc#mul not implemented for MinMax"
+  lit = MinMax
+  add = max
+  mul = min
 
 instance Expr Mod7 where
-  lit = error "Week05.Calc#lit not implemented for Mod7"
-  add = error "Week05.Calc#add not implemented for Mod7"
-  mul = error "Week05.Calc#mul not implemented for Mod7"
+  lit = Mod7 . (flip mod) 7
+  add (Mod7 m) (Mod7 n) = Mod7 (mod (m + n) 7)
+  mul (Mod7 m) (Mod7 n) = Mod7 (mod (m * n) 7)
 
 --------------------------------------------------- Exercise 5
 
 instance Expr SVM.Program where
-  lit = error "Week05.Calc#mul not implemented for Program"
-  add = error "Week05.Calc#mul not implemented for Program"
-  mul = error "Week05.Calc#mul not implemented for Program"
+  lit :: Integer -> SVM.Program
+  lit n = [SVM.PushI n]
+  add :: SVM.Program -> SVM.Program -> SVM.Program
+  add p1 p2 = p1 ++ p2 ++ [SVM.Add]
+  mul :: SVM.Program -> SVM.Program -> SVM.Program
+  mul p1 p2 = p1 ++ p2 ++ [SVM.Mul]
 
 compile :: String -> SVM.Program
-compile = error "Week05.Calc#compile not implemented"
+compile = concat . parseExp lit add mul
 
 --------------------------------------------------- Exercise 6
 
@@ -90,25 +106,70 @@ data VarExprT = LitWithVar Integer
   deriving (Show, Eq)
 
 instance Expr VarExprT where
-  lit = error "Week05.Calc#lit not implemented for VarExprT"
-  add = error "Week05.Calc#add not implemented for VarExprT"
-  mul = error "Week05.Calc#mul not implemented for VarExprT"
+  lit = LitWithVar
+  add = AddWithVar
+  mul = MulWithVar
 
 instance HasVars VarExprT where
-  var = error "Week05.Calc#var not implemented for VarExprT"
+  var = Var
 
 instance HasVars (M.Map String Integer -> Maybe Integer) where
-  var =
-    error
-      "Week05.Calc#var not implemented for (M.Map String Integer -> Maybe Integer)"
+  var :: String -> (M.Map String Integer -> Maybe Integer)
+  var = M.lookup
 
 instance Expr (M.Map String Integer -> Maybe Integer) where
-  lit =
-    error
-      "Week05.Calc#lit not implemented for (M.Map String Integer -> Maybe Integer)"
-  add =
-    error
-      "Week05.Calc#add not implemented for (M.Map String Integer -> Maybe Integer)"
-  mul =
-    error
-      "Week05.Calc#mul not implemented for (M.Map String Integer -> Maybe Integer)"
+  lit :: Integer -> (M.Map String Integer -> Maybe Integer)
+  lit i _ = Just i
+  add
+    :: (M.Map String Integer -> Maybe Integer)
+    -> (M.Map String Integer -> Maybe Integer)
+    -> M.Map String Integer
+    -> Maybe Integer
+---------------------------------------- soln 1
+
+  add f g m = case f m of
+    Nothing -> Nothing
+    Just x  -> case g m of
+      Nothing -> Nothing
+      Just y  -> Just (x + y)
+
+---------------------------------------- soln 2
+
+-- add f g m = (+) <$> g m <*> f m
+
+---------------------------------------- soln 3
+
+-- add f g m = do
+--   x <- f m
+--   y <- g m
+--   return (x + y)
+
+  mul
+    :: (M.Map String Integer -> Maybe Integer)
+    -> (M.Map String Integer -> Maybe Integer)
+    -> (M.Map String Integer -> Maybe Integer)
+---------------------------------------- soln 1
+
+  mul f g m = case f m of
+    Nothing -> Nothing
+    Just x  -> case g m of
+      Nothing -> Nothing
+      Just y  -> Just (x * y)
+
+---------------------------------------- soln 2
+
+-- mul f g m = (*) <$> g m <*> f m
+
+---------------------------------------- soln 3
+
+-- mul f g m = do
+--   x <- f m
+--   y <- g m
+--   return (x * y)
+
+-- withVars
+--   :: [(String, Integer)]
+--   -> (M.Map String Integer -> Maybe Integer)
+--   -> Maybe Integer
+-- withVars vs ex = ex $ M.fromList vs
+
