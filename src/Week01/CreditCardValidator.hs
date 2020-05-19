@@ -8,17 +8,22 @@ module Week01.CreditCardValidator
 where
 
 toDigits :: Integer -> [Integer]
-toDigits = error "Week01.CreditCardValidator#toDigits not implemented"
+toDigits x 
+  | x <= 0 = []
+  | otherwise = map (\y -> read (y:[])) (show x)
 
 toDigitsRev :: Integer -> [Integer]
-toDigitsRev = error "Week01.CreditCardValidator#toDigitsRev not implemented"
+toDigitsRev = reverse . toDigits
 
 doubleEveryOther :: [Integer] -> [Integer]
-doubleEveryOther =
-  error "Week01.CreditCardValidator#doubleEveryOther not implemented"
+doubleEveryOther [] = []
+doubleEveryOther (x:xs)
+  | xs == [] = [x]
+  | length xs `mod` 2 == 0 = x : doubleEveryOther xs
+  | otherwise = x * 2 : doubleEveryOther xs
 
 sumDigits :: [Integer] -> Integer
-sumDigits = error "Week01.CreditCardValidator#sumDigits not implemented"
+sumDigits xs = sum (map sum (map toDigits xs))
 
 validate :: Integer -> Bool
-validate = error "Week01.CreditCardValidator#validate not implemented"
+validate x = (sumDigits . doubleEveryOther . toDigits) x `mod` 10 == 0
