@@ -18,7 +18,15 @@ import           Week02.Log                     ( LogMessage(..)
                                                 )
 
 parseMessage :: String -> LogMessage
-parseMessage = error "Week02.LogAnalysis#parseMessage not implemented"
+parseMessage str = parseMessageWords (words str)
+
+parseMessageWords :: [String] -> LogMessage
+parseMessageWords [] = Unknown ""
+parseMessageWords (s:ss)
+  | s == "E" = LogMessage (Error 0) 0 (unwords ss)
+  | s == "I" = LogMessage Info 0 (unwords ss)
+  | s == "W" = LogMessage Warning 0 (unwords ss)
+  | otherwise = Unknown (unwords ss)
 
 parse :: String -> [LogMessage]
 parse = error "Week02.LogAnalysis#parse not implemented"
