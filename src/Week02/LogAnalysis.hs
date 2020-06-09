@@ -16,6 +16,7 @@ import           Week02.Log                     ( LogMessage(..)
                                                 , testWhatWentWrong
                                                 , testParse
                                                 )
+import Text.Read
 
 parseMessage :: String -> LogMessage
 parseMessage str = parseMessageWords (words str)
@@ -23,10 +24,28 @@ parseMessage str = parseMessageWords (words str)
 parseMessageWords :: [String] -> LogMessage
 parseMessageWords [] = Unknown ""
 parseMessageWords (s:ss)
-  | s == "E" = LogMessage (Error 0) 0 (unwords ss)
-  | s == "I" = LogMessage Info 0 (unwords ss)
-  | s == "W" = LogMessage Warning 0 (unwords ss)
-  | otherwise = Unknown (unwords ss)
+  | s == "E" = case parseError ss of
+      Nothing -> Unknown (unwords (s:ss))
+      Just logMessage -> logMessage      
+  | s == "I" = case parseTimestamp Info ss of
+      Nothing -> Unknown (unwords (s:ss))
+      Just logMessage -> logMessage
+  | s == "W" = case parseTimestamp Warning ss of
+      Nothing -> Unknown (unwords (s:ss))
+      Just logMessage -> logMessage
+  | otherwise = Unknown (unwords (s:ss))
+
+parseError :: [String] -> Maybe LogMessage
+parseError [] = Nothing
+parseError (s:ss) = case readMaybe s of
+  Nothing -> Nothing
+  Just errorLevel -> parseTimestamp (Error errorLevel) ss
+
+parseTimestamp :: MessageType -> [String] -> Maybe LogMessage
+parseTimestamp _ [] = Nothing
+parseTimestamp mt (s:ss) = case readMaybe s of
+  Nothing -> Nothing
+  Just timestamp -> Just (LogMessage mt timestamp (unwords ss))
 
 parse :: String -> [LogMessage]
 parse = error "Week02.LogAnalysis#parse not implemented"
