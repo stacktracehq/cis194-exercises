@@ -52,19 +52,15 @@ parse :: String -> [LogMessage]
 parse s = map parseMessage (lines s)
 
 insert :: LogMessage -> MessageTree -> MessageTree
+insert (Unknown _) tr = tr
 insert lm Leaf = Node Leaf lm Leaf
-insert lm tr@(Node left existing right)
+insert lm (Node left existing right)
   | isEarlier lm existing = Node (insert lm left) existing right
-  | isLaterOrSameTime lm existing = Node left existing (insert lm right)
-  | otherwise = tr
+  | otherwise = Node left existing (insert lm right)
 
 isEarlier :: LogMessage -> LogMessage -> Bool
 isEarlier (LogMessage _ left _) (LogMessage _ right _) = left < right
 isEarlier _ _ = False
-
-isLaterOrSameTime :: LogMessage -> LogMessage -> Bool
-isLaterOrSameTime (LogMessage _ left _) (LogMessage _ right _) = left >= right
-isLaterOrSameTime _ _ = False
 
 build :: [LogMessage] -> MessageTree
 build = error "Week02.LogAnalysis#build not implemented"
