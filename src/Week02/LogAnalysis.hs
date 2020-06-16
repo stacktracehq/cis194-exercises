@@ -23,17 +23,18 @@ parseMessage str = parseMessageWords (words str)
 
 parseMessageWords :: [String] -> LogMessage
 parseMessageWords [] = Unknown ""
-parseMessageWords (s:ss)
-  | s == "E" = case parseError ss of
-      Nothing -> Unknown (unwords (s:ss))
-      Just logMessage -> logMessage      
-  | s == "I" = case parseTimestamp Info ss of
-      Nothing -> Unknown (unwords (s:ss))
-      Just logMessage -> logMessage
-  | s == "W" = case parseTimestamp Warning ss of
-      Nothing -> Unknown (unwords (s:ss))
-      Just logMessage -> logMessage
-  | otherwise = Unknown (unwords (s:ss))
+parseMessageWords (s:ss) = case (getParser s) ss of
+  Nothing -> Unknown (unwords (s:ss))
+  Just logMessage -> logMessage  
+
+getParser :: String -> [String] -> Maybe LogMessage
+getParser "E" = parseError
+getParser "I" = parseTimestamp Info
+getParser "W" = parseTimestamp Warning
+getParser _ = nothingFromArray
+
+nothingFromArray :: [String] -> Maybe LogMessage
+nothingFromArray _ = Nothing
 
 parseError :: [String] -> Maybe LogMessage
 parseError [] = Nothing
@@ -48,10 +49,22 @@ parseTimestamp mt (s:ss) = case readMaybe s of
   Just timestamp -> Just (LogMessage mt timestamp (unwords ss))
 
 parse :: String -> [LogMessage]
-parse = error "Week02.LogAnalysis#parse not implemented"
+parse s = map parseMessage (lines s)
 
 insert :: LogMessage -> MessageTree -> MessageTree
-insert = error "Week02.LogAnalysis#insert not implemented"
+insert lm Leaf = Node Leaf lm Leaf
+insert lm tr@(Node left existing right)
+  | isEarlier lm existing = Node (insert lm left) existing right
+  | isLaterOrSameTime lm existing = Node left existing (insert lm right)
+  | otherwise = tr
+
+isEarlier :: LogMessage -> LogMessage -> Bool
+isEarlier (LogMessage _ left _) (LogMessage _ right _) = left < right
+isEarlier _ _ = False
+
+isLaterOrSameTime :: LogMessage -> LogMessage -> Bool
+isLaterOrSameTime (LogMessage _ left _) (LogMessage _ right _) = left >= right
+isLaterOrSameTime _ _ = False
 
 build :: [LogMessage] -> MessageTree
 build = error "Week02.LogAnalysis#build not implemented"
