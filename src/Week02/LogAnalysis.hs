@@ -63,10 +63,15 @@ isEarlier (LogMessage _ left _) (LogMessage _ right _) = left < right
 isEarlier _ _ = False
 
 build :: [LogMessage] -> MessageTree
-build = error "Week02.LogAnalysis#build not implemented"
+build [] = Leaf
+build (lm:lms) = insert lm (build lms)
 
 inOrder :: MessageTree -> [LogMessage]
-inOrder = error "Week02.LogAnalysis#inOrder not implemented"
+inOrder Leaf = []
+inOrder (Node Leaf lm Leaf) = [lm]
+inOrder (Node Leaf lm right) = [lm] ++ inOrder right
+inOrder (Node left lm Leaf) = inOrder left ++ [lm]
+inOrder (Node left lm right) = inOrder left ++ [lm] ++ inOrder right
 
 whatWentWrong :: [LogMessage] -> [String]
 whatWentWrong = error "Week02.LogAnalysis#whatWentWrong not implemented"
