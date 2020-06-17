@@ -74,4 +74,12 @@ inOrder (Node left lm Leaf) = inOrder left ++ [lm]
 inOrder (Node left lm right) = inOrder left ++ [lm] ++ inOrder right
 
 whatWentWrong :: [LogMessage] -> [String]
-whatWentWrong = error "Week02.LogAnalysis#whatWentWrong not implemented"
+whatWentWrong lms = [getMessage lm | lm <- lms, isRelevant lm]
+
+getMessage :: LogMessage -> String
+getMessage (LogMessage _ _ msg) = msg
+getMessage (Unknown msg) = msg
+
+isRelevant :: LogMessage -> Bool
+isRelevant (LogMessage (Error lvl) _ _) = lvl >= 50
+isRelevant _ = False
