@@ -64,7 +64,7 @@ isEarlier _ _ = False
 
 build :: [LogMessage] -> MessageTree
 build [] = Leaf
-build (lm:lms) = insert lm (build lms)
+build (lm:lms) = insert lm (build (reverse lms))
 
 inOrder :: MessageTree -> [LogMessage]
 inOrder Leaf = []
@@ -74,7 +74,7 @@ inOrder (Node left lm Leaf) = inOrder left ++ [lm]
 inOrder (Node left lm right) = inOrder left ++ [lm] ++ inOrder right
 
 whatWentWrong :: [LogMessage] -> [String]
-whatWentWrong lms = [getMessage lm | lm <- lms, isRelevant lm]
+whatWentWrong lms = [getMessage lm | lm <- inOrder (build lms), isRelevant lm]
 
 getMessage :: LogMessage -> String
 getMessage (LogMessage _ _ msg) = msg
